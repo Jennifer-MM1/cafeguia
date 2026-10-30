@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const { renderFicha } = require('./server/ssr');
+const resenas = require('./server/resenas');
 
 const app = express();
 const PUERTO = process.env.PORT || 3000;
@@ -35,12 +36,15 @@ app.get('/api/catalogo/:id', (req, res) => {
   res.json(lugar);
 });
 
+// Fase 8.1 · Reseñas
+app.use('/api/resenas', resenas.router);
+
 // ---------- SSR ----------
 // Fase 4.3 · La ficha de cada cafetería generada en el servidor
 app.get('/lugar/:id', (req, res) => {
   const lugar = leerCatalogo().find((l) => l.id === Number(req.params.id));
   if (!lugar) return res.status(404).send('Cafetería no encontrada');
-  res.send(renderFicha(lugar));
+  res.send(renderFicha(lugar, resenas.resenasDe(lugar.id)));
 });
 
 app.listen(PUERTO, () => {

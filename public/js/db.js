@@ -78,5 +78,26 @@
     },
   };
 
+  // Fase 8 · Envía al servidor las reseñas pendientes. Lo usan tanto el evento
+  // "sync" del service worker como la página (navegadores sin Background Sync).
+  // Si alguna falla, lanza un error para que el navegador reintente el sync.
+  CafeDB.enviarResenasPendientes = async function (url = 'api/resenas') {
+    const pendientes = await CafeDB.porIndice('resenas', 'porEstado', 'pendiente');
+    let enviadas = 0;
+    for (const resena of pendientes) {
+      const { idLocal, estado, ...datos } = resena;
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+      if (!r.ok) throw new Error(`El servidor respondió ${r.status}`);
+      const guardada = await r.json();
+      await CafeDB.guardar('resenas', { ...resena, estado: 'enviada', idServidor: guardada.id });
+      enviadas++;
+    }
+    return enviadas;
+  };
+
   global.CafeDB = CafeDB;
 })(self);

@@ -10,6 +10,16 @@ export function estrellas(valor = 0) {
   return '★'.repeat(llenas) + '☆'.repeat(5 - llenas);
 }
 
+// Aviso flotante breve (toast)
+export function mostrarAviso(texto, ms = 3500) {
+  const aviso = document.createElement('div');
+  aviso.className = 'aviso';
+  aviso.setAttribute('role', 'status');
+  aviso.textContent = texto;
+  document.body.appendChild(aviso);
+  setTimeout(() => aviso.remove(), ms);
+}
+
 export function tarjetaLugar(lugar, extra = '') {
   return `
     <a class="tarjeta" href="#/lugar/${lugar.id}">

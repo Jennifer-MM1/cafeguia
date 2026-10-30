@@ -1,11 +1,15 @@
 // =====================================================================
 // CaféGuía · Service worker
 // Fase 3: eventos base · Fase 7: estrategias de caché y offline
+// Fase 8: Background Sync
 // =====================================================================
+
+// La misma capa IndexedDB que usa la página (expone self.CafeDB)
+importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
@@ -25,6 +29,7 @@ const ARCHIVOS_SHELL = [
   './js/instalacion.js',
   './js/preferencias.js',
   './js/conexion.js',
+  './js/resenas.js',
   './js/vistas/inicio.js',
   './js/vistas/catalogo.js',
   './js/vistas/ficha.js',
@@ -140,3 +145,21 @@ self.addEventListener('fetch', (evento) => {
   // CSS, JS y demás archivos del shell → cache first
   evento.respondWith(primeroCache(request));
 });
+
+// ---------------------------------------------------------------------
+// Fase 8.3 · sync: el navegador lo dispara cuando vuelve la conexión
+// (incluso con la app cerrada). Si la promesa falla, el navegador reintenta.
+// ---------------------------------------------------------------------
+self.addEventListener('sync', (evento) => {
+  if (evento.tag === 'enviar-resenas') {
+    evento.waitUntil(sincronizarResenas());
+  }
+});
+
+async function sincronizarResenas() {
+  const cantidad = await self.CafeDB.enviarResenasPendientes('./api/resenas');
+  console.log('[SW] reseñas sincronizadas:', cantidad);
+  if (!cantidad) return;
+  const ventanas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  ventanas.forEach((c) => c.postMessage({ tipo: 'resenas-sincronizadas', cantidad }));
+}

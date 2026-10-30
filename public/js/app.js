@@ -4,9 +4,11 @@ import { iniciarEnrutador } from './enrutador.js';
 import './instalacion.js';
 import { aplicarTema } from './preferencias.js';
 import { iniciarIndicador } from './conexion.js';
+import { iniciarSincronizacion } from './resenas.js';
 
 aplicarTema();
 iniciarIndicador();
+iniciarSincronizacion();
 
 // Fase 5.2 · Ocultar el splash cuando la primera vista esté lista
 // (con un mínimo de 700 ms para que no sea un parpadeo).
