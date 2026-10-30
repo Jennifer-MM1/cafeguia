@@ -5,6 +5,7 @@ const path = require('path');
 const express = require('express');
 const { renderFicha } = require('./server/ssr');
 const resenas = require('./server/resenas');
+const push = require('./server/push');
 
 const app = express();
 const PUERTO = process.env.PORT || 3000;
@@ -38,6 +39,19 @@ app.get('/api/catalogo/:id', (req, res) => {
 
 // Fase 8.1 · Reseñas
 app.use('/api/resenas', resenas.router);
+
+// Fase 10.3 · Notificaciones push
+app.use('/api/push', push.router);
+
+// Cada reseña nueva genera un push para todos los suscritos
+resenas.eventos.on('nueva-resena', (resena) => {
+  const lugar = leerCatalogo().find((l) => l.id === resena.lugarId);
+  push.enviarATodos({
+    titulo: `Nueva reseña en ${lugar?.nombre || 'CaféGuía'}`,
+    cuerpo: `${resena.autor}: ${'★'.repeat(resena.calificacion)} ${resena.texto.slice(0, 80)}`,
+    url: `./#/lugar/${resena.lugarId}`,
+  }).catch((e) => console.error('[push]', e.message));
+});
 
 // ---------- SSR ----------
 // Fase 4.3 · La ficha de cada cafetería generada en el servidor

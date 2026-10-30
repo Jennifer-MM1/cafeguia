@@ -1,7 +1,7 @@
 // =====================================================================
 // CaféGuía · Service worker
 // Fase 3: eventos base · Fase 7: estrategias de caché y offline
-// Fase 8: Background Sync · Fase 9: ciclo de vida
+// Fase 8: Background Sync · Fase 9: ciclo de vida · Fase 10: push
 // =====================================================================
 
 // La misma capa IndexedDB que usa la página (expone self.CafeDB)
@@ -9,7 +9,7 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v7';
+const VERSION = 'v8';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
@@ -30,6 +30,7 @@ const ARCHIVOS_SHELL = [
   './js/preferencias.js',
   './js/conexion.js',
   './js/resenas.js',
+  './js/notificaciones.js',
   './js/vistas/inicio.js',
   './js/vistas/catalogo.js',
   './js/vistas/ficha.js',
@@ -176,3 +177,46 @@ async function sincronizarResenas() {
   const ventanas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
   ventanas.forEach((c) => c.postMessage({ tipo: 'resenas-sincronizadas', cantidad }));
 }
+
+// ---------------------------------------------------------------------
+// Fase 10.5 · push: llega un mensaje del servidor (aunque la app esté cerrada)
+// ---------------------------------------------------------------------
+self.addEventListener('push', (evento) => {
+  let datos = {};
+  try {
+    datos = evento.data ? evento.data.json() : {};
+  } catch {
+    datos = { cuerpo: evento.data?.text() };
+  }
+  const titulo = datos.titulo || 'CaféGuía';
+  evento.waitUntil(
+    self.registration.showNotification(titulo, {
+      body: datos.cuerpo || 'Tienes novedades',
+      icon: './icons/icon-192.png',
+      badge: './icons/badge-96.png',
+      vibrate: [100, 50, 100],
+      tag: datos.tag,                     // mismo tag = reemplaza la anterior
+      data: { url: datos.url || './' },
+      actions: [
+        { action: 'abrir', title: 'Ver' },
+        { action: 'cerrar', title: 'Cerrar' },
+      ],
+    })
+  );
+});
+
+// Al tocar la notificación: enfocar una ventana abierta o abrir una nueva
+self.addEventListener('notificationclick', (evento) => {
+  evento.notification.close();
+  if (evento.action === 'cerrar') return;
+  const destino = new URL(evento.notification.data?.url || './', self.registration.scope).href;
+  evento.waitUntil((async () => {
+    const ventanas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const abierta = ventanas.find((v) => v.url.startsWith(self.registration.scope));
+    if (abierta) {
+      await abierta.focus();
+      return abierta.navigate(destino);
+    }
+    return self.clients.openWindow(destino);
+  })());
+});
