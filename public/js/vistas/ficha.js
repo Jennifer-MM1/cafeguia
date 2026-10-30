@@ -1,6 +1,7 @@
 import { obtenerLugar, hayServidor } from '../api.js';
 import { escaparHTML, estrellas, mostrarAviso } from '../util.js';
 import { guardarResena, resenasLocales, resenasRemotas } from '../resenas.js';
+import { compartir } from '../dispositivo.js';
 
 export async function vistaFicha(contenedor, { id }) {
   const lugar = await obtenerLugar(id);
@@ -54,6 +55,17 @@ export async function vistaFicha(contenedor, { id }) {
     else await self.CafeDB.guardar('favoritos', { id: lugar.id, fecha: Date.now() });
     pintarFav(!es);
   });
+
+  // Fase 11 · Compartir con la hoja nativa del dispositivo
+  const btnCompartir = document.createElement('button');
+  btnCompartir.className = 'boton secundario';
+  btnCompartir.textContent = '↗ Compartir';
+  btnCompartir.addEventListener('click', async () => {
+    const url = new URL(`#/lugar/${lugar.id}`, location.href).href;
+    const r = await compartir({ titulo: lugar.nombre, texto: lugar.descripcion, url });
+    if (r === 'copiado') mostrarAviso('Enlace copiado al portapapeles');
+  });
+  acciones.appendChild(btnCompartir);
 
   // Enlace a la versión renderizada en el servidor (solo si hay servidor Node)
   if (await hayServidor()) {

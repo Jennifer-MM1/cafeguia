@@ -63,6 +63,8 @@ function renderFicha(lugar, resenas = []) {
   </main>
   <!-- Estado inicial serializado para la hidratación (Fase 11) -->
   <script id="estado-inicial" type="application/json">${JSON.stringify({ lugar, resenas }).replace(/</g, '\\u003c')}</script>
+  <script src="js/db.js"></script>
+  <script type="module" src="js/hidratar.js"></script>
 </body>
 </html>`;
 }
