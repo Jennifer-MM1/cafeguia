@@ -2,6 +2,7 @@
 // Se guardan en data/resenas.json para no necesitar una base de datos.
 const fs = require('fs');
 const path = require('path');
+const EventEmitter = require('events');
 const express = require('express');
 
 const ARCHIVO = path.join(__dirname, '..', 'data', 'resenas.json');
@@ -23,6 +24,7 @@ const resenasDe = (lugarId) =>
   leer().filter((r) => r.lugarId === Number(lugarId)).sort((a, b) => b.fecha.localeCompare(a.fecha));
 
 const router = express.Router();
+const eventos = new EventEmitter(); // avisa de reseñas nuevas a otros módulos
 
 // GET /api/resenas?lugar=3
 router.get('/', (req, res) => {
@@ -55,7 +57,7 @@ router.post('/', (req, res) => {
   resenas.push(nueva);
   escribir(resenas);
   res.status(201).json(nueva);
-  router.emit('nueva-resena', nueva); // la Fase 10 la usa para enviar un push
+  eventos.emit('nueva-resena', nueva); // la Fase 10 la usa para enviar un push
 });
 
-module.exports = { router, resenasDe };
+module.exports = { router, resenasDe, eventos };
