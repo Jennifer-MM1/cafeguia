@@ -92,7 +92,7 @@ function renderFicha(lugar, resenas = []) {
       <div>
         <p class="ficha-descripcion">${esc(lugar.descripcion)}</p>
         <dl class="datos">
-          <div class="dato">${ICONO.pin}<div><dt>Dirección</dt><dd>${esc(lugar.direccion)}</dd></div></div>
+          <div class="dato">${ICONO.pin}<div><dt>Dirección</dt><dd>${esc([lugar.direccion, lugar.ciudad].filter(Boolean).join(', '))}</dd></div></div>
           <div class="dato">${ICONO.reloj}<div><dt>Horario</dt><dd>${esc(lugar.horario)}</dd></div></div>
         </dl>
         <div class="etiquetas">${lugar.etiquetas.map((e) => `<span class="etiqueta">${esc(e)}</span>`).join('')}</div>

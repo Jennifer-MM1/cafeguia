@@ -10,7 +10,7 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v19';
+const VERSION = 'v20';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
@@ -35,6 +35,7 @@ const ARCHIVOS_SHELL = [
   './js/iconos.js',
   './js/fotos.js',
   './js/horario.js',
+  './js/ciudades.js',
   './fonts/bricolage-grotesque.woff2',
   './js/instalacion.js',
   './js/preferencias.js',

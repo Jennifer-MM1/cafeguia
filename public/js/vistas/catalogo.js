@@ -2,6 +2,7 @@ import { obtenerCatalogo } from '../api.js';
 import { filaLugar, escaparHTML } from '../util.js';
 import { icono } from '../iconos.js';
 import { estaAbierto } from '../horario.js';
+import { ciudadElegida, selectorCiudad, conectarSelector } from '../ciudades.js';
 import { leerPreferencias, guardarPreferencia } from '../preferencias.js';
 
 const ORDENES = {
@@ -23,6 +24,7 @@ export async function vistaCatalogo(contenedor) {
     texto: params.get('q') || '',
     etiqueta: params.get('etiqueta') || '',
     abiertas: params.get('abiertas') === '1',
+    ciudad: ciudadElegida(),
     orden: ORDENES[leerPreferencias().orden] ? leerPreferencias().orden : 'calificacion',
   };
 
@@ -31,6 +33,7 @@ export async function vistaCatalogo(contenedor) {
       <h1>Catálogo</h1>
       <p>Todas las cafeterías de la guía. Filtra por lo que necesitas o búscalas por nombre.</p>
     </header>
+    ${selectorCiudad(estado.ciudad)}
     <div class="buscador">
       ${icono.buscar}
       <label for="buscar" class="solo-lector">Buscar cafetería</label>
@@ -61,9 +64,10 @@ export async function vistaCatalogo(contenedor) {
   const pintar = () => {
     const t = estado.texto.trim().toLowerCase();
     const filtrados = catalogo
+      .filter((l) => !estado.ciudad || l.ciudad === estado.ciudad)
       .filter((l) => !estado.abiertas || estaAbierto(l))
       .filter((l) => !estado.etiqueta || l.etiquetas.includes(estado.etiqueta))
-      .filter((l) => !t || [l.nombre, l.direccion, ...l.etiquetas].some((c) => c.toLowerCase().includes(t)))
+      .filter((l) => !t || [l.nombre, l.direccion, l.ciudad, ...l.etiquetas].some((c) => c.toLowerCase().includes(t)))
       .sort(ORDENES[estado.orden].fn);
 
     chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.etiqueta === estado.etiqueta)));
@@ -96,6 +100,7 @@ export async function vistaCatalogo(contenedor) {
     const fila = activo.parentElement;
     fila.scrollLeft = activo.offsetLeft - fila.offsetLeft - 16;
   }
+  conectarSelector(contenedor, (ciudad) => { estado.ciudad = ciudad; pintar(); });
   chipAbiertas.addEventListener('click', () => { estado.abiertas = !estado.abiertas; pintar(); });
   orden.addEventListener('change', () => {
     estado.orden = orden.value;

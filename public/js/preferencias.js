@@ -1,7 +1,7 @@
 // Fase 6.2 · Preferencias en localStorage.
 // localStorage es síncrono y solo guarda texto: ideal para datos pequeños como el tema.
 const CLAVE = 'cafeguia:preferencias';
-const POR_DEFECTO = { tema: 'sistema', orden: 'calificacion', ultimaVisita: null };
+const POR_DEFECTO = { tema: 'sistema', orden: 'calificacion', ciudad: '', ultimaVisita: null };
 
 export function leerPreferencias() {
   try {

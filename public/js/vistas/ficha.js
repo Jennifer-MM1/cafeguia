@@ -36,7 +36,7 @@ export async function vistaFicha(contenedor, { id }) {
       <div>
         <p class="ficha-descripcion">${escaparHTML(lugar.descripcion)}</p>
         <dl class="datos">
-          <div class="dato">${icono.pin}<div><dt>Dirección</dt><dd>${escaparHTML(lugar.direccion)}</dd></div></div>
+          <div class="dato">${icono.pin}<div><dt>Dirección</dt><dd>${escaparHTML([lugar.direccion, lugar.ciudad].filter(Boolean).join(', '))}</dd></div></div>
           <div class="dato">${icono.reloj}<div><dt>Horario</dt><dd>${escaparHTML(lugar.horario)}</dd></div></div>
         </dl>
         <div class="etiquetas">${lugar.etiquetas.map((e) => `<span class="etiqueta">${escaparHTML(e)}</span>`).join('')}</div>

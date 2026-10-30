@@ -1,6 +1,7 @@
 import { obtenerCatalogo } from '../api.js';
 import { selloLugar, filaLugar } from '../util.js';
 import { icono } from '../iconos.js';
+import { ciudadElegida, filtrarPorCiudad, nombresCiudades, selectorCiudad, conectarSelector } from '../ciudades.js';
 import { estadoInstalacion, alCambiarInstalacion, instalar } from '../instalacion.js';
 
 // Fase 5.3 · Home con botón de instalación
@@ -18,14 +19,17 @@ export async function vistaInicio(contenedor) {
   const [catalogo, favoritos] = await Promise.all([
     obtenerCatalogo(), self.CafeDB.obtenerTodos('favoritos'),
   ]);
-  const destacados = [...catalogo].sort((a, b) => b.calificacion - a.calificacion).slice(0, 3);
+  const ciudad = ciudadElegida();
+  const enCiudad = filtrarPorCiudad(catalogo, ciudad);
+  const destacados = [...enCiudad].sort((a, b) => b.calificacion - a.calificacion).slice(0, 3);
   const idsFavoritos = new Set(favoritos.map((f) => f.id));
   const misFavoritos = catalogo.filter((l) => idsFavoritos.has(l.id));
 
   contenedor.innerHTML = `
     <section class="portada">
       <h1>¿Dónde tomamos café hoy?</h1>
-      <p>${catalogo.length} cafeterías de San Juan del Río, con horarios, precios y reseñas de quienes ya fueron.</p>
+      <p>${enCiudad.length} cafeterías en ${ciudad || nombresCiudades()}, con horarios, precios y reseñas de quienes ya fueron.</p>
+      ${selectorCiudad(ciudad)}
       <form class="buscador" role="search" id="form-buscar">
         ${icono.buscar}
         <label for="q" class="solo-lector">Buscar cafetería</label>
@@ -40,7 +44,7 @@ export async function vistaInicio(contenedor) {
 
     <section class="seccion">
       <div class="seccion-titulo">
-        <h2>Las mejor calificadas</h2>
+        <h2>${ciudad ? `Las mejor calificadas en ${ciudad}` : 'Las mejor calificadas'}</h2>
         <a href="#/catalogo">Ver todas</a>
       </div>
       <div class="sellos">${destacados.map(selloLugar).join('')}</div>
@@ -57,6 +61,9 @@ export async function vistaInicio(contenedor) {
       <p id="texto-instalar"></p>
       <button id="btn-instalar" class="boton" hidden>Instalar</button>
     </div>`;
+
+  // Cambiar de ciudad vuelve a pintar el inicio con esa ciudad
+  conectarSelector(contenedor, () => vistaInicio(contenedor));
 
   contenedor.querySelector('#form-buscar').addEventListener('submit', (e) => {
     e.preventDefault();

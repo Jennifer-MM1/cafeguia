@@ -50,7 +50,7 @@ export function selloLugar(lugar) {
       <span class="sello-arriba">${horarioHTML(lugar)}<span>${lugar.precio}</span></span>
       <span class="sello-nombre">${escaparHTML(lugar.nombre)}</span>
       <span class="sello-pie">
-        <span>${escaparHTML(lugar.direccion)}</span>
+        <span>${escaparHTML(lugar.ciudad || lugar.direccion)}</span>
         ${calificacionHTML(lugar.calificacion)}
       </span>
     </a>`;
@@ -65,7 +65,7 @@ export function filaLugar(lugar, lado = icono.ir) {
           ? imgFoto({ ...lugar.foto, alt: '' }) : iniciales(lugar.nombre)}</span>
         <span class="fila-info">
           <h3>${escaparHTML(lugar.nombre)}</h3>
-          <p>${escaparHTML(lugar.direccion)}</p>
+          <p>${escaparHTML([lugar.ciudad, lugar.direccion].filter(Boolean).join(', '))}</p>
           <span class="fila-datos">
             ${calificacionHTML(lugar.calificacion)}
             <span class="precio" title="${precioTexto(lugar.precio)}">${lugar.precio}</span>

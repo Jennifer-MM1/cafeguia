@@ -148,7 +148,11 @@ Llena [docs/PRUEBAS.md](docs/PRUEBAS.md): herramientas, casos de prueba y Lighth
 | **Compartir hacia CaféGuía** | `manifest.json` (`share_target`), `sw.js`, `js/vistas/compartir.js` | Web Share Target: el SW recibe el `POST` con la foto, la guarda en IndexedDB y redirige con `303`. Funciona también en GitHub Pages porque no toca el servidor |
 | **Contador en el ícono** | `js/db.js` (`actualizarInsignia`) | Badging API (`setAppBadge`): número de reseñas por publicar en el ícono de la app instalada, actualizado desde la página y desde el SW |
 
-**Créditos de las fotografías:** Jonathan Borba, julian urrutia, 99.films, Ichsan Chairul, Chris J. Davis y Robert Bye, en [Unsplash](https://unsplash.com) (Licencia Unsplash). Cada foto muestra su crédito en la ficha de la cafetería. Son ilustrativas: las cafeterías de la guía son ficticias.
+**Créditos de las fotografías:** Jonathan Borba, julian urrutia, 99.films, Ichsan Chairul, Chris J. Davis, Robert Bye, Jorge Garcia, Konrad Hofmann, Homniom Coffee y Joseph Cortez, en [Unsplash](https://unsplash.com) (Licencia Unsplash). Cada foto muestra su crédito en la ficha de la cafetería. Son ilustrativas: las cafeterías de la guía son ficticias.
+
+### Ciudades
+
+La guía cubre **San Juan del Río** (6 cafeterías) y **Jalpan de Serra** (4). Cada cafetería tiene un campo `ciudad` en `data/catalogo.json`; las ciudades se definen en `js/ciudades.js` (nombre, punto de referencia y centro para «Cerca de mí»). La ciudad elegida en Inicio o en el Catálogo se recuerda en localStorage. Para agregar otra ciudad: añádela a `CIUDADES` y agrega sus cafeterías al catálogo con ese mismo nombre en `ciudad`.
 
 **Cómo probar «Compartir»:** instala la app en Android, abre la galería, toca *Compartir* en una foto y elige CaféGuía. En escritorio puedes simularlo desde la consola:
 

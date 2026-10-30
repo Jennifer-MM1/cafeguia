@@ -2,6 +2,7 @@
   {
     "id": 1,
     "nombre": "Grano de Cantera",
+    "ciudad": "San Juan del Río",
     "descripcion": "Café de especialidad de Veracruz y Chiapas, métodos de filtrado y pan de la casa.",
     "direccion": "Av. Juárez 12, Centro",
     "horario": "Lun–Sáb 8:00–21:00",
@@ -39,6 +40,7 @@
   {
     "id": 2,
     "nombre": "La Taza del Puente",
+    "ciudad": "San Juan del Río",
     "descripcion": "Cafetería familiar junto al puente histórico. Chocolate caliente y conchas recién horneadas.",
     "direccion": "Calle Hidalgo 45, Centro",
     "horario": "Todos los días 7:30–20:00",
@@ -77,6 +79,7 @@
   {
     "id": 3,
     "nombre": "Molienda Lenta",
+    "ciudad": "San Juan del Río",
     "descripcion": "Espacio tranquilo para estudiar: enchufes en cada mesa, cold brew y té matcha.",
     "direccion": "Blvd. Hidalgo 210",
     "horario": "Lun–Vie 9:00–22:00",
@@ -113,6 +116,7 @@
   {
     "id": 4,
     "nombre": "Tostador Norte",
+    "ciudad": "San Juan del Río",
     "descripcion": "Tostador propio a la vista. Venden café en grano y molido para llevar.",
     "direccion": "Paseo Central 8",
     "horario": "Mar–Dom 10:00–19:00",
@@ -150,6 +154,7 @@
   {
     "id": 5,
     "nombre": "Café Terraza 1531",
+    "ciudad": "San Juan del Río",
     "descripcion": "Terraza con vista al jardín principal, ideal para tardes con postre y café de olla.",
     "direccion": "Jardín Independencia 3",
     "horario": "Todos los días 11:00–23:00",
@@ -188,6 +193,7 @@
   {
     "id": 6,
     "nombre": "Express Universitario",
+    "ciudad": "San Juan del Río",
     "descripcion": "Barra rápida cerca de la universidad: americano grande y bagel a precio de estudiante.",
     "direccion": "Av. La Palma 105",
     "horario": "Lun–Vie 7:00–18:00",
@@ -219,6 +225,160 @@
       "autor": "Robert Bye",
       "pagina": "https://unsplash.com/photos/F2eHfMwIOxA",
       "alt": "Clientes pidiendo en la barra de una cafetería"
+    }
+  },
+  {
+    "id": 7,
+    "nombre": "Café Misión",
+    "ciudad": "Jalpan de Serra",
+    "descripcion": "Bajo los portales frente a la Misión de Santiago. Café de olla, chocolate de metate y vista a la fachada barroca.",
+    "direccion": "Portal Hidalgo 3, Jardín Principal",
+    "horario": "Todos los días 8:00–21:00",
+    "precio": "$$",
+    "etiquetas": [
+      "café de olla",
+      "terraza",
+      "vista"
+    ],
+    "color": "#7a3b2a",
+    "calificacion": 4.7,
+    "lat": 21.2178,
+    "lng": -99.4729,
+    "horarios": [
+      {
+        "dias": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "08:00",
+        "cierra": "21:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1696200277430-b1e750470c54",
+      "autor": "Jorge Garcia",
+      "pagina": "https://unsplash.com/photos/no33BywkreI",
+      "alt": "Portal colonial con arcos y columnas junto a un patio"
+    }
+  },
+  {
+    "id": 8,
+    "nombre": "La Presa Café",
+    "ciudad": "Jalpan de Serra",
+    "descripcion": "Desayunos frente a la presa de Jalpan: chilaquiles, fruta y café americano con vista al agua.",
+    "direccion": "Malecón de la Presa s/n",
+    "horario": "Mié–Lun 7:30–16:00",
+    "precio": "$$",
+    "etiquetas": [
+      "desayunos",
+      "vista",
+      "familiar"
+    ],
+    "color": "#2c5a6e",
+    "calificacion": 4.5,
+    "lat": 21.2112,
+    "lng": -99.4788,
+    "horarios": [
+      {
+        "dias": [
+          0,
+          1,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "07:30",
+        "cierra": "16:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1721821299011-6b6851431781",
+      "autor": "Konrad Hofmann",
+      "pagina": "https://unsplash.com/photos/HelnuPLfRzg",
+      "alt": "Desayuno en un balcón con vista a un lago"
+    }
+  },
+  {
+    "id": 9,
+    "nombre": "Tostadores de la Sierra",
+    "ciudad": "Jalpan de Serra",
+    "descripcion": "Tuestan en el local granos de pequeños productores de la región y de Veracruz. Venden por kilo.",
+    "direccion": "Calle Morelos 18, Centro",
+    "horario": "Lun–Sáb 9:00–19:00",
+    "precio": "$$",
+    "etiquetas": [
+      "tostador",
+      "especialidad",
+      "para llevar"
+    ],
+    "color": "#3d3a2f",
+    "calificacion": 4.8,
+    "lat": 21.2196,
+    "lng": -99.4712,
+    "horarios": [
+      {
+        "dias": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "09:00",
+        "cierra": "19:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1736592506186-6bc73c7d1424",
+      "autor": "Homniom Coffee",
+      "pagina": "https://unsplash.com/photos/5c0jJvLQz70",
+      "alt": "Tostador sacando granos de café de un costal"
+    }
+  },
+  {
+    "id": 10,
+    "nombre": "Pan y Piloncillo",
+    "ciudad": "Jalpan de Serra",
+    "descripcion": "Panadería con horno de leña. Café de olla servido en jarrito de barro y pan recién salido a las 6 de la tarde.",
+    "direccion": "Av. Insurgentes 41",
+    "horario": "Todos los días 7:00–22:00",
+    "precio": "$",
+    "etiquetas": [
+      "café de olla",
+      "pan artesanal",
+      "económico"
+    ],
+    "color": "#8a4b22",
+    "calificacion": 4.6,
+    "lat": 21.2158,
+    "lng": -99.4751,
+    "horarios": [
+      {
+        "dias": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "07:00",
+        "cierra": "22:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1735590624263-1c0e0d24f7de",
+      "autor": "Joseph Cortez",
+      "pagina": "https://unsplash.com/photos/Hsd76LkrOTw",
+      "alt": "Jarritos de barro para café de olla sobre una mesa"
     }
   }
 ]

@@ -1,5 +1,5 @@
 // «Abierto ahora»: calcula si una cafetería está abierta a partir de sus horarios.
-// Se usa la hora de San Juan del Río (America/Mexico_City), no la del dispositivo,
+// Se usa la hora de Querétaro (America/Mexico_City, igual en todas las ciudades de la guía), no la del dispositivo,
 // para que el resultado sea correcto aunque el teléfono esté en otra zona horaria.
 // Funciona sin conexión: no consulta ningún servidor.
 
