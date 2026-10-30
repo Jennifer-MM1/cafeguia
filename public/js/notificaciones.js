@@ -81,7 +81,7 @@ export async function enviarPushDePrueba() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      titulo: '☕ Promoción de hoy',
+      titulo: 'Promoción de hoy',
       cuerpo: '2x1 en capuchinos en Grano de Cantera hasta las 6 pm.',
       url: './#/lugar/1',
     }),

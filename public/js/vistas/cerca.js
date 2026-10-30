@@ -1,25 +1,32 @@
 // Fase 11.2 · Vista «Cerca de mí»: ordena las cafeterías por distancia usando el GPS.
 import { obtenerCatalogo } from '../api.js';
-import { tarjetaLugar } from '../util.js';
+import { filaLugar } from '../util.js';
+import { icono } from '../iconos.js';
 import { obtenerUbicacion, distanciaKm, vibrar, estadoBateria, soporte } from '../dispositivo.js';
 
 // Si el usuario no da permiso, se puede usar el centro de San Juan del Río
 const UBICACION_EJEMPLO = { lat: 20.3886, lng: -99.9961, precision: null, ejemplo: true };
 
+const formatoDistancia = (km) => (km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`);
+// Caminando a ~80 m por minuto
+const minutosAPie = (km) => Math.max(1, Math.round((km * 1000) / 80));
+
 export async function vistaCerca(contenedor) {
   const bateria = await estadoBateria();
+  const ahorro = bateria && bateria.nivel < 20 && !bateria.cargando;
+
   contenedor.innerHTML = `
-    <h1>Cerca de mí</h1>
-    <p class="meta">Usamos el GPS de tu dispositivo para ordenar las cafeterías por distancia.
-      Tu ubicación no sale de tu teléfono.</p>
-    ${bateria && bateria.nivel < 20 && !bateria.cargando
-      ? `<p class="meta">🔋 Batería al ${bateria.nivel}%: usaremos ubicación aproximada para ahorrar energía.</p>` : ''}
-    <div class="acciones">
-      <button id="btn-ubicar" class="boton" ${soporte.geolocalizacion ? '' : 'disabled'}>📍 Usar mi ubicación</button>
-      <button id="btn-ejemplo" class="boton secundario">Usar ubicación de ejemplo</button>
+    <header class="encabezado">
+      <h1>Cerca de mí</h1>
+      <p>Ordenamos las cafeterías por distancia con el GPS de tu teléfono. Tu ubicación no se envía a ningún servidor.</p>
+    </header>
+    ${ahorro ? `<p class="nota">Tu batería está al ${bateria.nivel}%. Usaremos una ubicación aproximada para gastar menos energía.</p>` : ''}
+    <div class="acciones" style="margin-top:16px">
+      <button id="btn-ubicar" class="boton" type="button" ${soporte.geolocalizacion ? '' : 'disabled'}>${icono.cerca}Usar mi ubicación</button>
+      <button id="btn-ejemplo" class="boton secundario" type="button">Probar desde el centro</button>
     </div>
-    <p id="estado-ubicacion" class="meta" role="status"></p>
-    <div id="lista-cerca" class="rejilla"></div>`;
+    <p id="estado-ubicacion" class="contador" role="status"></p>
+    <div id="lista-cerca"></div>`;
 
   const estado = contenedor.querySelector('#estado-ubicacion');
   const lista = contenedor.querySelector('#lista-cerca');
@@ -30,20 +37,19 @@ export async function vistaCerca(contenedor) {
       .map((l) => ({ ...l, km: distanciaKm(origen, l) }))
       .sort((a, b) => a.km - b.km);
     estado.textContent = origen.ejemplo
-      ? 'Mostrando distancias desde el centro de San Juan del Río (ejemplo).'
-      : `Tu ubicación: ${origen.lat.toFixed(4)}, ${origen.lng.toFixed(4)} (±${origen.precision} m)`;
-    lista.innerHTML = ordenados.map((l) => tarjetaLugar(l,
-      `<p class="distancia">${l.km < 1 ? `${Math.round(l.km * 1000)} m` : `${l.km.toFixed(1)} km`}</p>`)).join('');
+      ? 'Distancias desde el Jardín Independencia, en el centro de San Juan del Río.'
+      : `Distancias desde tu ubicación (precisión de ${origen.precision} m).`;
+    lista.innerHTML = `<ul class="directorio">${ordenados.map((l) => filaLugar(l,
+      `<span class="distancia">${formatoDistancia(l.km)}</span><small>${minutosAPie(l.km)} min a pie</small>`)).join('')}</ul>`;
     vibrar([40, 30, 40]);
   }
 
   contenedor.querySelector('#btn-ubicar').addEventListener('click', async () => {
     estado.textContent = 'Buscando tu ubicación…';
     try {
-      const precisa = !(bateria && bateria.nivel < 20 && !bateria.cargando);
-      await mostrar(await obtenerUbicacion({ precisa }));
+      await mostrar(await obtenerUbicacion({ precisa: !ahorro }));
     } catch (e) {
-      estado.textContent = `✖ ${e.message}. Puedes usar la ubicación de ejemplo.`;
+      estado.textContent = `${e.message}. Puedes probar desde el centro de la ciudad.`;
     }
   });
   contenedor.querySelector('#btn-ejemplo').addEventListener('click', () => mostrar(UBICACION_EJEMPLO));

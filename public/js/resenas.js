@@ -65,7 +65,7 @@ export async function enviarDesdeLaPagina() {
 }
 
 function avisarSincronizadas(n) {
-  mostrarAviso(`✔ ${n} reseña(s) enviada(s) al servidor`);
+  mostrarAviso(n === 1 ? "Tu reseña se publicó" : `Se publicaron ${n} reseñas`);
   window.dispatchEvent(new CustomEvent('resenas-sincronizadas'));
 }
 

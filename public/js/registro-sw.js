@@ -63,7 +63,7 @@ function mostrarAvisoActualizacion(trabajador) {
   aviso.className = 'aviso';
   aviso.setAttribute('role', 'alert');
   aviso.innerHTML = `
-    <span>✨ Hay una versión nueva de CaféGuía.</span>
+    <span>Hay una versión nueva de CaféGuía.</span>
     <button class="boton" type="button">Actualizar</button>`;
   aviso.querySelector('button').addEventListener('click', () => {
     aviso.querySelector('button').disabled = true;

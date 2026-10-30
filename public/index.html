@@ -3,42 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="CaféGuía: descubre cafeterías, deja reseñas aunque no tengas internet y recibe avisos.">
+  <meta name="description" content="CaféGuía: encuentra cafeterías en San Juan del Río, guarda tus favoritas y deja reseñas aunque no tengas internet.">
   <title>CaféGuía</title>
+  <link rel="preload" href="fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/estilos.css">
 
   <!-- Fase 2: manifiesto e íconos -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2b1a12">
+  <meta name="theme-color" content="#f2f4f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111915" media="(prefers-color-scheme: dark)">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <!-- iOS no lee los íconos del manifiesto: necesita estas etiquetas -->
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="CaféGuía">
 </head>
 <body>
   <!-- Fase 5.2 · Splash dentro de la app: cubre la pantalla mientras arranca el enrutador -->
   <div id="splash" class="splash" role="status" aria-label="Cargando CaféGuía">
-    <span class="splash-logo" aria-hidden="true">☕</span>
+    <span class="splash-sello" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13v5a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z"/><path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c0 1.2 1 1.3 1 2.5M12 3.5c0 1.2 1 1.3 1 2.5"/></svg>
+    </span>
     <span class="splash-texto">CaféGuía</span>
+    <span class="splash-progreso" aria-hidden="true"></span>
   </div>
 
   <!-- ===== APP SHELL: lo que siempre se ve, se guarda en caché y carga al instante ===== -->
   <header class="barra">
-    <a class="marca" href="#/">
-      <span class="marca-logo" aria-hidden="true">☕</span>
-      <span class="marca-nombre">CaféGuía</span>
+    <a class="marca" href="#/" aria-label="CaféGuía, inicio">
+      <span class="marca-sello" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13v5a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z"/><path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c0 1.2 1 1.3 1 2.5M12 3.5c0 1.2 1 1.3 1 2.5"/></svg>
+      </span>
+      CaféGuía
     </a>
-  </header>
 
-  <nav class="menu" aria-label="Navegación principal">
-    <a href="#/" data-ruta="inicio">Inicio</a>
-    <a href="#/catalogo" data-ruta="catalogo">Catálogo</a>
-    <a href="#/cerca" data-ruta="cerca">Cerca de mí</a>
-    <a href="#/ajustes" data-ruta="ajustes">Ajustes</a>
-  </nav>
+    <!-- En celular se muestra como pestañas abajo; en escritorio, aquí en la barra -->
+    <nav class="menu" aria-label="Navegación principal">
+      <a href="#/" data-ruta="inicio" data-icono="inicio">Inicio</a>
+      <a href="#/catalogo" data-ruta="catalogo" data-icono="lista">Catálogo</a>
+      <a href="#/cerca" data-ruta="cerca" data-icono="cerca">Cerca de mí</a>
+      <a href="#/ajustes" data-ruta="ajustes" data-icono="ajustes">Ajustes</a>
+    </nav>
+  </header>
 
   <!-- Aquí el enrutador (CSR) pinta cada vista -->
   <main id="vista" class="vista" tabindex="-1">
@@ -46,7 +54,7 @@
   </main>
 
   <footer class="pie">
-    <small>CaféGuía · PWA de ejemplo</small>
+    CaféGuía es una aplicación web progresiva de ejemplo. Los datos de las cafeterías son ficticios.
   </footer>
   <!-- db.js es un script clásico: también lo usa el service worker con importScripts -->
   <script src="js/db.js"></script>

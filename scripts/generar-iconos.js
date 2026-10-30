@@ -1,14 +1,14 @@
 // Fase 2.1 · Genera los íconos PNG de la PWA sin dependencias externas.
-// Dibuja una taza de café sobre fondo café oscuro y escribe archivos PNG válidos
+// Dibuja una taza de porcelana sobre el verde hoja de la marca y escribe archivos PNG válidos
 // usando solo zlib (incluido en Node). Uso: npm run iconos
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
 const SALIDA = path.join(__dirname, '..', 'public', 'icons');
-const FONDO = [43, 26, 18];      // --cafe-900
-const TAZA = [246, 239, 230];    // --crema
-const CAFE = [217, 130, 43];     // --acento
+const FONDO = [31, 90, 68];      // --hoja #1f5a44
+const TAZA = [242, 244, 241];    // --porcelana #f2f4f1
+const CAFE = [111, 66, 40];      // café tostado #6f4228
 
 // Tabla CRC32 para los bloques PNG
 const TABLA = Array.from({ length: 256 }, (_, n) => {

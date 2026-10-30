@@ -8,7 +8,7 @@
     "precio": "$$",
     "etiquetas": ["especialidad", "wifi", "pan artesanal"],
     "emoji": "☕",
-    "color": "#8b5e3c",
+    "color": "#6f4228",
     "calificacion": 4.7,
     "lat": 20.3889,
     "lng": -99.9958
@@ -22,7 +22,7 @@
     "precio": "$",
     "etiquetas": ["familiar", "desayunos", "pet friendly"],
     "emoji": "🥐",
-    "color": "#d9822b",
+    "color": "#9c3a2e",
     "calificacion": 4.4,
     "lat": 20.3871,
     "lng": -99.9935
@@ -36,7 +36,7 @@
     "precio": "$$",
     "etiquetas": ["estudiar", "wifi", "cold brew"],
     "emoji": "📚",
-    "color": "#2e7d4f",
+    "color": "#1f5a44",
     "calificacion": 4.6,
     "lat": 20.3925,
     "lng": -100.0012
@@ -50,7 +50,7 @@
     "precio": "$$$",
     "etiquetas": ["tostador", "para llevar", "especialidad"],
     "emoji": "🫘",
-    "color": "#5b3a29",
+    "color": "#2e2a27",
     "calificacion": 4.8,
     "lat": 20.3958,
     "lng": -99.9897
@@ -64,7 +64,7 @@
     "precio": "$$",
     "etiquetas": ["terraza", "postres", "café de olla"],
     "emoji": "🌿",
-    "color": "#6b8e23",
+    "color": "#4a6630",
     "calificacion": 4.3,
     "lat": 20.388,
     "lng": -99.997
@@ -78,7 +78,7 @@
     "precio": "$",
     "etiquetas": ["rápido", "estudiantes", "para llevar"],
     "emoji": "🎓",
-    "color": "#3b6ea5",
+    "color": "#2c4d78",
     "calificacion": 4.1,
     "lat": 20.379,
     "lng": -100.009

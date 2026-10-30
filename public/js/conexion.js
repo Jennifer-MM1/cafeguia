@@ -21,7 +21,7 @@ export function iniciarIndicador() {
 
   const pintar = () => {
     const ok = navigator.onLine;
-    pastilla.textContent = ok ? '● En línea' : '● Sin conexión';
+    pastilla.textContent = ok ? 'En línea' : 'Sin conexión';
     pastilla.classList.toggle('sin-red', !ok);
     oyentes.forEach((fn) => fn(ok));
   };

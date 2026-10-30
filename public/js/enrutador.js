@@ -8,7 +8,7 @@ import { vistaAjustes } from './vistas/ajustes.js';
 
 const RUTAS = [
   { patron: /^\/$/, nombre: 'inicio', vista: vistaInicio },
-  { patron: /^\/catalogo$/, nombre: 'catalogo', vista: vistaCatalogo },
+  { patron: /^\/catalogo(\?.*)?$/, nombre: 'catalogo', vista: vistaCatalogo },
   { patron: /^\/lugar\/(?<id>\d+)$/, nombre: 'catalogo', vista: vistaFicha },
   { patron: /^\/cerca$/, nombre: 'cerca', vista: vistaCerca },
   { patron: /^\/ajustes$/, nombre: 'ajustes', vista: vistaAjustes },

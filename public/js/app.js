@@ -5,6 +5,12 @@ import './instalacion.js';
 import { aplicarTema } from './preferencias.js';
 import { iniciarIndicador } from './conexion.js';
 import { iniciarSincronizacion } from './resenas.js';
+import { icono } from './iconos.js';
+
+// Íconos del menú (se insertan desde JS para no repetir los SVG en el HTML)
+document.querySelectorAll('.menu a[data-icono]').forEach((a) => {
+  a.insertAdjacentHTML('afterbegin', icono[a.dataset.icono]);
+});
 
 aplicarTema();
 iniciarIndicador();

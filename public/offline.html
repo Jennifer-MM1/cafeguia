@@ -3,33 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sin conexión · CaféGuía</title>
-  <meta name="theme-color" content="#2b1a12">
-  <!-- Estilos en línea: esta página debe verse bien aunque falle todo lo demás -->
+  <title>Sin conexión | CaféGuía</title>
+  <meta name="theme-color" content="#f2f4f1">
+  <!-- El SW puede servir esta página en /lugar/:id; la base apunta a la raíz de la app -->
+  <script>
+    (function () {
+      var ruta = location.pathname;
+      var corte = ruta.indexOf('/lugar/');
+      var base = document.createElement('base');
+      base.href = corte >= 0 ? ruta.slice(0, corte + 1) : ruta.replace(/[^/]*$/, '');
+      document.head.appendChild(base);
+    })();
+  </script>
+  <!-- Estilos en línea: esta página debe verse bien aunque falle todo lo demás.
+       La fuente sí viene del caché del shell; si no está, usa la del sistema. -->
   <style>
+    @font-face {
+      font-family: "Bricolage";
+      src: url("fonts/bricolage-grotesque.woff2") format("woff2-variations");
+      font-weight: 200 800;
+      font-stretch: 75% 100%;
+    }
+    :root { --porcelana: #f2f4f1; --tinta: #1c2620; --salvia: #5e6b64; --hoja: #1f5a44; --linea: #dbe1dc; }
+    @media (prefers-color-scheme: dark) {
+      :root { --porcelana: #111915; --tinta: #e6ece8; --salvia: #9aa8a0; --hoja: #6cc19d; --linea: #2a3730; }
+    }
+    * { box-sizing: border-box; }
     body {
-      margin: 0; min-height: 100vh; display: grid; place-items: center;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: #2b1a12; color: #f6efe6; text-align: center; padding: 24px;
+      margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+      font-family: "Bricolage", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+      background: var(--porcelana); color: var(--tinta); line-height: 1.5;
     }
-    .icono { font-size: 4rem; }
-    h1 { margin: 8px 0; }
-    p { opacity: .85; max-width: 32ch; margin: 8px auto; }
+    main { max-width: 420px; }
+    .sello {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--linea); color: var(--salvia);
+    }
+    .sello svg { width: 30px; height: 30px; }
+    h1 {
+      font-size: clamp(2.2rem, 9vw, 3.2rem); font-weight: 800; font-stretch: 78%;
+      line-height: .95; letter-spacing: -.02em; margin: 24px 0 12px;
+    }
+    p { color: var(--salvia); margin: 0 0 10px; }
+    .acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
     a, button {
-      display: inline-block; margin-top: 16px; padding: 10px 18px; border: 0;
-      border-radius: 10px; background: #d9822b; color: #fff; font: inherit;
-      font-weight: 600; text-decoration: none; cursor: pointer;
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px;
+      border: 1.5px solid var(--hoja); border-radius: 999px;
+      background: var(--hoja); color: var(--porcelana);
+      font: inherit; font-weight: 650; font-size: .9rem; text-decoration: none; cursor: pointer;
     }
+    button { background: transparent; color: var(--hoja); }
   </style>
 </head>
 <body>
   <main>
-    <div class="icono" aria-hidden="true">☕🔌</div>
-    <h1>Sin conexión</h1>
-    <p>Esta página no se ha guardado todavía en tu dispositivo.</p>
-    <p>Puedes seguir usando el catálogo y escribir reseñas: se enviarán solas cuando vuelva internet.</p>
-    <a href="./">Ir al inicio</a>
-    <button onclick="location.reload()">Reintentar</button>
+    <span class="sello" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.5a15 15 0 0 1 5-2.9M22 8.5a15 15 0 0 0-8.5-3.4"/><path d="M5 12a10 10 0 0 1 4-2M19 12a10 10 0 0 0-2.4-1.5"/><path d="M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/><path d="m3 3 18 18"/></svg>
+    </span>
+    <h1>Esta página no está guardada</h1>
+    <p>No tienes conexión y aún no habías abierto esta página, así que no hay una copia en tu teléfono.</p>
+    <p>El catálogo, tus guardadas y las reseñas sí funcionan sin internet. Lo que escribas se publica al reconectar.</p>
+    <div class="acciones">
+      <a href="./">Ir al catálogo</a>
+      <button type="button" onclick="location.reload()">Reintentar</button>
+    </div>
   </main>
   <script>
     // Recarga automática al recuperar la conexión

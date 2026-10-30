@@ -7,56 +7,64 @@ import {
   suscripcionActual, suscribirPush, desuscribirPush, enviarPushDePrueba,
 } from '../notificaciones.js';
 
+const fila = (titulo, detalle, control) => `
+  <div class="ajuste">
+    <div class="ajuste-texto"><strong>${titulo}</strong>${detalle ? `<span>${detalle}</span>` : ''}</div>
+    ${control}
+  </div>`;
+
 // Fase 10 · Sección de notificaciones
 async function pintarNotificaciones(caja) {
   if (!soportaNotificaciones()) {
-    caja.innerHTML = '<h2>Notificaciones</h2><p class="meta">Este navegador no soporta notificaciones.</p>';
+    caja.innerHTML = '<h2>Notificaciones</h2><p class="ayuda">Este navegador no puede mostrar notificaciones.</p>';
     return;
   }
   const [suscripcion, servidor] = await Promise.all([suscripcionActual(), hayServidor()]);
   const permiso = permisoActual();
-  const textoPermiso = { granted: '✔ concedido', denied: '✖ bloqueado', default: 'sin decidir' }[permiso];
+  const textoPermiso = { granted: 'Permitidas', denied: 'Bloqueadas', default: 'Sin decidir' }[permiso];
 
   caja.innerHTML = `
     <h2>Notificaciones</h2>
-    <p class="meta">Permiso: <strong>${textoPermiso}</strong> ·
-      Push: <strong>${suscripcion ? 'suscrito' : 'no suscrito'}</strong></p>
-    ${permiso === 'denied' ? '<p class="meta">Desbloquéalas desde el candado de la barra de direcciones.</p>' : ''}
-    ${!servidor ? '<p class="meta">Push necesita el servidor Node (no funciona en GitHub Pages).</p>' : ''}
+    ${fila('Permiso del navegador', 'Se pide la primera vez que activas un aviso.', `<span class="ajuste-valor">${textoPermiso}</span>`)}
+    ${fila('Avisos de reseñas y promociones', 'Te llegan aunque tengas la app cerrada.',
+      `<span class="ajuste-valor">${suscripcion ? 'Activados' : 'Desactivados'}</span>`)}
+    ${permiso === 'denied' ? '<p class="nota">Están bloqueadas. Para permitirlas, toca el candado junto a la dirección de la página.</p>' : ''}
+    ${!servidor ? '<p class="nota">Los avisos push necesitan el servidor de CaféGuía. En la versión publicada en GitHub Pages solo funcionan las notificaciones de prueba.</p>' : ''}
     <div class="acciones">
-      <button class="boton secundario" data-accion="local">Probar notificación local</button>
-      ${soportaPush() && servidor && !suscripcion && permiso !== 'denied' ? '<button class="boton" data-accion="suscribir">Activar push</button>' : ''}
-      ${suscripcion && servidor ? '<button class="boton" data-accion="probar-push">Enviarme un push</button>' : ''}
-      ${suscripcion ? '<button class="boton secundario" data-accion="desuscribir">Desactivar push</button>' : ''}
+      ${soportaPush() && servidor && !suscripcion && permiso !== 'denied' ? '<button class="boton" type="button" data-accion="suscribir">Activar avisos</button>' : ''}
+      ${suscripcion && servidor ? '<button class="boton" type="button" data-accion="probar-push">Enviarme un aviso de prueba</button>' : ''}
+      ${permiso !== 'denied' ? '<button class="boton secundario" type="button" data-accion="local">Probar notificación local</button>' : ''}
+      ${suscripcion ? '<button class="boton secundario" type="button" data-accion="desuscribir">Desactivar avisos</button>' : ''}
     </div>`;
 
   caja.addEventListener('click', async (e) => {
-    const accion = e.target.dataset?.accion;
-    if (!accion) return;
-    e.target.disabled = true;
+    const boton = e.target.closest('[data-accion]');
+    if (!boton) return;
+    const { accion } = boton.dataset;
+    boton.disabled = true;
     try {
       if (accion === 'local') {
-        if ((await pedirPermiso()) !== 'granted') throw new Error('Permiso denegado');
-        await notificacionLocal('Hola desde CaféGuía ☕', {
-          body: 'Esta notificación la generó tu dispositivo, sin servidor.',
+        if ((await pedirPermiso()) !== 'granted') throw new Error('No diste permiso para mostrar notificaciones');
+        await notificacionLocal('Así se ven los avisos de CaféGuía', {
+          body: 'Esta notificación la creó tu dispositivo, sin pasar por el servidor.',
           data: { url: './#/ajustes' },
         });
       }
-      if (accion === 'suscribir') { await suscribirPush(); mostrarAviso('✔ Push activado'); }
-      if (accion === 'desuscribir') { await desuscribirPush(); mostrarAviso('Push desactivado'); }
+      if (accion === 'suscribir') { await suscribirPush(); mostrarAviso('Avisos activados'); }
+      if (accion === 'desuscribir') { await desuscribirPush(); mostrarAviso('Avisos desactivados'); }
       if (accion === 'probar-push') {
         const r = await enviarPushDePrueba();
-        mostrarAviso(`Push enviado a ${r.enviados} dispositivo(s)`);
+        mostrarAviso(r.enviados === 1 ? 'Aviso enviado a 1 dispositivo' : `Aviso enviado a ${r.enviados} dispositivos`);
       }
     } catch (error) {
-      mostrarAviso(`✖ ${error.message}`);
+      mostrarAviso(error.message);
     }
-    e.target.disabled = false;
+    boton.disabled = false;
     // Al cambiar la suscripción se vuelve a pintar la sección (en un nodo nuevo
     // para no acumular oyentes de clic)
     if (accion === 'suscribir' || accion === 'desuscribir') {
       const nueva = document.createElement('section');
-      nueva.className = 'caja';
+      nueva.className = 'panel';
       nueva.id = 'caja-notificaciones';
       caja.replaceWith(nueva);
       pintarNotificaciones(nueva);
@@ -72,40 +80,44 @@ export async function vistaAjustes(contenedor) {
   const [catalogo, favoritos, resenas] = await Promise.all([
     db.obtenerTodos('catalogo'), db.obtenerTodos('favoritos'), db.obtenerTodos('resenas'),
   ]);
+  const pendientes = resenas.filter((r) => r.estado === 'pendiente').length;
 
-  let espacio = 'no disponible';
+  let espacio = 'No disponible';
   if (navigator.storage?.estimate) {
-    const { usage, quota } = await navigator.storage.estimate();
-    espacio = `${(usage / 1024).toFixed(0)} KB usados de ${(quota / 1024 / 1024).toFixed(0)} MB`;
+    const { usage } = await navigator.storage.estimate();
+    espacio = usage > 1024 * 1024 ? `${(usage / 1024 / 1024).toFixed(1)} MB` : `${Math.round(usage / 1024)} KB`;
   }
 
   contenedor.innerHTML = `
-    <h1>Ajustes</h1>
+    <div class="ajustes">
+      <header class="encabezado"><h1>Ajustes</h1></header>
 
-    <section class="caja">
-      <h2>Apariencia <small class="meta">(localStorage)</small></h2>
-      <label for="tema">Tema</label>
-      <select id="tema">
-        <option value="sistema">Igual que el sistema</option>
-        <option value="claro">Claro</option>
-        <option value="oscuro">Oscuro</option>
-      </select>
-    </section>
+      <section class="panel">
+        <h2>Apariencia</h2>
+        ${fila('Tema', 'Se guarda en este dispositivo.', `
+          <label for="tema" class="solo-lector">Tema</label>
+          <select id="tema">
+            <option value="sistema">Igual que el sistema</option>
+            <option value="claro">Claro</option>
+            <option value="oscuro">Oscuro</option>
+          </select>`)}
+      </section>
 
-    <section class="caja" id="caja-notificaciones"></section>
+      <section class="panel" id="caja-notificaciones"></section>
 
-    <section class="caja">
-      <h2>Datos en este dispositivo <small class="meta">(IndexedDB)</small></h2>
-      <p class="meta">Catálogo respaldado: ${catalogo.length} cafeterías</p>
-      <p class="meta">Favoritos: ${favoritos.length}</p>
-      <p class="meta">Reseñas locales: ${resenas.length}
-        (${resenas.filter((r) => r.estado === 'pendiente').length} pendientes de enviar)</p>
-      <p class="meta">Almacenamiento: ${espacio}</p>
-      <p class="meta">Versión del service worker: <strong>${await versionServiceWorker()}</strong></p>
-      <div class="acciones">
-        <button id="borrar-datos" class="boton secundario">Borrar datos locales</button>
-      </div>
-    </section>`;
+      <section class="panel">
+        <h2>Datos sin conexión</h2>
+        <p class="ayuda">Lo que CaféGuía guarda en este dispositivo para funcionar sin internet.</p>
+        ${fila('Cafeterías disponibles sin conexión', '', `<span class="ajuste-valor">${catalogo.length}</span>`)}
+        ${fila('Guardadas', '', `<span class="ajuste-valor">${favoritos.length}</span>`)}
+        ${fila('Reseñas por publicar', pendientes ? 'Se publican solas al reconectar.' : '', `<span class="ajuste-valor">${pendientes}</span>`)}
+        ${fila('Espacio usado', '', `<span class="ajuste-valor">${espacio}</span>`)}
+        ${fila('Versión de la app', '', `<span class="ajuste-valor">${await versionServiceWorker()}</span>`)}
+        <div class="acciones">
+          <button id="borrar-datos" class="boton secundario" type="button">Borrar datos de este dispositivo</button>
+        </div>
+      </section>
+    </div>`;
 
   const selTema = contenedor.querySelector('#tema');
   selTema.value = prefs.tema;
@@ -114,7 +126,8 @@ export async function vistaAjustes(contenedor) {
   await pintarNotificaciones(contenedor.querySelector('#caja-notificaciones'));
 
   contenedor.querySelector('#borrar-datos').addEventListener('click', async () => {
-    if (!confirm('¿Borrar favoritos, reseñas locales y el respaldo del catálogo?')) return;
+    const aviso = pendientes ? ` Perderás ${pendientes} reseña(s) que aún no se publican.` : '';
+    if (!confirm(`Se borrarán tus guardadas, tus reseñas locales y la copia del catálogo.${aviso}`)) return;
     await Promise.all(['catalogo', 'favoritos', 'resenas'].map((s) => db.limpiar(s)));
     localStorage.clear();
     location.reload();

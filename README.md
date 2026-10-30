@@ -4,6 +4,13 @@ Guía de cafeterías construida como **Aplicación Web Progresiva**: se instala,
 
 > Los datos de las cafeterías son ficticios y sirven solo como ejemplo.
 
+## Diseño
+
+- **Paleta** tomada de la planta del café: porcelana `#F2F4F1` (fondo), tinta `#1C2620`, verde hoja `#1F5A44` (acciones), cereza `#B3343F` (calificaciones) y salvia `#5E6B64` (texto secundario). Tiene tema oscuro.
+- **Tipografía:** [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque) (licencia OFL), alojada en `public/fonts/` para que funcione sin conexión. Su eje de ancho permite los nombres condensados.
+- **Elemento principal:** cada cafetería se muestra como una etiqueta de tostador, con su nombre grande sobre su propio color.
+- **Navegación:** pestañas abajo en el celular y en la barra superior en escritorio. Íconos SVG en `public/js/iconos.js`.
+
 ## Inicio rápido
 
 ```bash
