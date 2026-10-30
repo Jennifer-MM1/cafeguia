@@ -1,0 +1,35 @@
+{
+  "id": "./",
+  "name": "CaféGuía · Cafeterías cerca de ti",
+  "short_name": "CaféGuía",
+  "description": "Descubre cafeterías, deja reseñas aunque no tengas internet y recibe avisos de promociones.",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "start_url": "./?origen=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#2b1a12",
+  "theme_color": "#2b1a12",
+  "categories": ["food", "lifestyle", "travel"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catálogo",
+      "short_name": "Catálogo",
+      "url": "./#/catalogo",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Cerca de mí",
+      "short_name": "Cerca",
+      "url": "./#/cerca",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
