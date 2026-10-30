@@ -1,1 +1,35 @@
-<!DOCTYPE html><html lang="es"><meta charset="UTF-8"><title>CaféGuía</title><h1>CaféGuía: servidor funcionando</h1></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="CaféGuía: descubre cafeterías, deja reseñas aunque no tengas internet y recibe avisos.">
+  <title>CaféGuía</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <!-- ===== APP SHELL: lo que siempre se ve, se guarda en caché y carga al instante ===== -->
+  <header class="barra">
+    <a class="marca" href="#/">
+      <span class="marca-logo" aria-hidden="true">☕</span>
+      <span class="marca-nombre">CaféGuía</span>
+    </a>
+  </header>
+
+  <nav class="menu" aria-label="Navegación principal">
+    <a href="#/" data-ruta="inicio">Inicio</a>
+    <a href="#/catalogo" data-ruta="catalogo">Catálogo</a>
+    <a href="#/cerca" data-ruta="cerca">Cerca de mí</a>
+    <a href="#/ajustes" data-ruta="ajustes">Ajustes</a>
+  </nav>
+
+  <!-- Aquí el enrutador (CSR) pinta cada vista -->
+  <main id="vista" class="vista" tabindex="-1">
+    <p class="cargando">Cargando…</p>
+  </main>
+
+  <footer class="pie">
+    <small>CaféGuía · PWA de ejemplo</small>
+  </footer>
+</body>
+</html>

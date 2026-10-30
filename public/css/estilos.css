@@ -1,0 +1,267 @@
+/* ==========================================================
+   CaféGuía · Hoja de estilos
+   Mobile-first: se diseña para celular y se amplía en pantallas grandes.
+   ========================================================== */
+
+:root {
+  --cafe-900: #2b1a12;
+  --cafe-700: #5b3a29;
+  --cafe-500: #8b5e3c;
+  --crema:    #f6efe6;
+  --leche:    #fffaf4;
+  --acento:   #d9822b;
+  --verde:    #2e7d4f;
+  --rojo:     #b3402f;
+  --texto:    #2b1a12;
+  --texto-2:  #6d5a4d;
+  --borde:    #e4d6c6;
+  --sombra:   0 2px 8px rgba(43, 26, 18, .08);
+  --radio:    14px;
+  --fuente:   system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Tema oscuro (se activa desde Ajustes o por el sistema) */
+:root[data-tema="oscuro"] {
+  --crema:   #1c1410;
+  --leche:   #261b15;
+  --texto:   #f3e9df;
+  --texto-2: #bba796;
+  --borde:   #3d2d23;
+  --sombra:  0 2px 8px rgba(0, 0, 0, .4);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  font-family: var(--fuente);
+  background: var(--crema);
+  color: var(--texto);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+}
+
+a { color: var(--acento); }
+img { max-width: 100%; display: block; }
+
+/* ---------- Barra superior ---------- */
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  background: var(--cafe-900);
+  color: #fff;
+}
+.marca { display: flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; }
+.marca-logo { font-size: 1.5rem; }
+.marca-nombre { font-weight: 700; font-size: 1.15rem; letter-spacing: .3px; }
+
+/* Indicador de conexión (Fase 7) */
+.estado-red {
+  font-size: .8rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--verde);
+  color: #fff;
+  white-space: nowrap;
+}
+.estado-red.sin-red { background: var(--rojo); }
+
+/* ---------- Menú ---------- */
+.menu {
+  display: flex;
+  overflow-x: auto;
+  background: var(--cafe-700);
+}
+.menu a {
+  flex: 1 0 auto;
+  padding: 10px 14px;
+  color: #f3e3d3;
+  text-decoration: none;
+  text-align: center;
+  font-size: .95rem;
+  border-bottom: 3px solid transparent;
+}
+.menu a.activa { color: #fff; border-bottom-color: var(--acento); font-weight: 600; }
+
+/* ---------- Contenido ---------- */
+.vista {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+  outline: none;
+}
+.cargando { color: var(--texto-2); text-align: center; padding: 40px 0; }
+
+h1, h2, h3 { line-height: 1.2; }
+h1 { font-size: 1.6rem; margin: 8px 0 12px; }
+h2 { font-size: 1.25rem; margin: 20px 0 10px; }
+
+.pie { text-align: center; padding: 16px; color: var(--texto-2); }
+
+/* ---------- Botones y formularios ---------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--acento);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+.boton:hover { filter: brightness(1.05); }
+.boton:disabled { opacity: .5; cursor: not-allowed; }
+.boton.secundario { background: transparent; color: var(--acento); border: 2px solid var(--acento); }
+.acciones { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+
+label { display: block; font-weight: 600; margin: 12px 0 4px; }
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--leche);
+  color: var(--texto);
+  font: inherit;
+}
+textarea { min-height: 90px; resize: vertical; }
+
+/* ---------- Tarjetas del catálogo ---------- */
+.rejilla {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 600px) { .rejilla { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px) { .rejilla { grid-template-columns: repeat(3, 1fr); } }
+
+.tarjeta {
+  background: var(--leche);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+}
+.tarjeta-imagen {
+  height: 120px;
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
+}
+.tarjeta-cuerpo { padding: 12px 14px; }
+.tarjeta h3 { margin: 0 0 4px; font-size: 1.1rem; }
+.meta { color: var(--texto-2); font-size: .9rem; margin: 0; }
+.estrellas { color: var(--acento); letter-spacing: 1px; }
+.etiqueta {
+  display: inline-block;
+  font-size: .75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--crema);
+  border: 1px solid var(--borde);
+  margin: 6px 4px 0 0;
+}
+
+/* ---------- Home / héroe ---------- */
+.heroe {
+  background: linear-gradient(135deg, var(--cafe-700), var(--cafe-900));
+  color: #fff;
+  border-radius: var(--radio);
+  padding: 24px 20px;
+  margin-bottom: 16px;
+}
+.heroe h1 { margin-top: 0; }
+.heroe p { opacity: .9; }
+
+/* ---------- Ficha de un lugar ---------- */
+.ficha-portada {
+  height: 160px;
+  border-radius: var(--radio);
+  display: grid;
+  place-items: center;
+  font-size: 4rem;
+}
+.caja {
+  background: var(--leche);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 14px;
+  margin: 12px 0;
+}
+
+/* Reseñas */
+.resena { border-top: 1px solid var(--borde); padding: 10px 0; }
+.resena:first-child { border-top: 0; }
+.resena-autor { font-weight: 600; }
+.pendiente {
+  font-size: .75rem;
+  background: #fff3cd;
+  color: #7a5a00;
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-left: 6px;
+}
+
+/* ---------- Splash dentro de la app (Fase 5) ---------- */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  background: var(--cafe-900);
+  color: #fff;
+  transition: opacity .4s ease;
+}
+.splash.oculto { opacity: 0; pointer-events: none; }
+.splash-logo { font-size: 4.5rem; animation: latido 1.2s ease-in-out infinite; }
+.splash-texto { font-size: 1.4rem; font-weight: 700; }
+@keyframes latido { 50% { transform: scale(1.12); } }
+
+/* ---------- Avisos flotantes (actualización, toasts) ---------- */
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: calc(100% - 32px);
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--cafe-900);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+}
+.aviso[hidden] { display: none; }
+
+/* ---------- Mapa sencillo de "Cerca de mí" ---------- */
+.distancia { font-weight: 700; color: var(--verde); }
+.vacio { color: var(--texto-2); text-align: center; padding: 30px 10px; }
