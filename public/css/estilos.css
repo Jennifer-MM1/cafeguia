@@ -572,6 +572,128 @@ textarea { min-height: 110px; resize: vertical; }
 .fila-campos { display: grid; gap: 0 12px; }
 @media (min-width: 520px) { .fila-campos { grid-template-columns: 1fr 1fr; } }
 
+/* ---------- Fotografías ---------- */
+/* Sello de portada con foto: la foto va al fondo y un degradado asegura el contraste */
+.sello-foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+.sello:has(.sello-foto)::after {
+  inset: 0;
+  width: auto; height: auto;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(to bottom, rgba(10, 16, 13, .55), rgba(10, 16, 13, .05) 35%, rgba(10, 16, 13, .1) 50%, rgba(10, 16, 13, .8));
+}
+.sello { min-height: 260px; }
+.sello-foto { transition: transform .4s ease; }
+.sello:hover .sello-foto { transform: scale(1.03); }
+
+.fila-sello { overflow: hidden; }
+.fila-sello img { width: 100%; height: 100%; object-fit: cover; }
+
+.ficha-cabecera.con-foto {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.ficha-cabecera .portada-foto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+.ficha-cabecera.con-foto::after {
+  inset: 0;
+  width: auto; height: auto;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(to bottom, rgba(10, 16, 13, .1) 30%, rgba(10, 16, 13, .82));
+}
+@media (min-width: 760px) { .ficha-cabecera.con-foto { min-height: 380px; } }
+.credito {
+  margin-top: 8px;
+  font-size: var(--t-xs);
+  color: var(--salvia);
+  text-align: right;
+}
+.credito a { color: inherit; }
+
+/* ---------- Horario: abierto / cierra pronto / cerrado ---------- */
+.horario {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--salvia);
+}
+.horario::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.horario.abierto { color: #237a52; }
+.horario.pronto { color: var(--ambar-texto); }
+:root[data-tema="oscuro"] .horario.abierto { color: #6cc19d; }
+.sello .horario, .ficha-cabecera .horario { color: #fff; }
+.sello .horario.abierto::before, .ficha-cabecera .horario.abierto::before { background: #5fd49a; }
+.sello .horario.pronto::before, .ficha-cabecera .horario.pronto::before { background: #f1c66b; }
+.sello .horario.cerrado::before, .ficha-cabecera .horario.cerrado::before { background: rgba(255, 255, 255, .6); }
+.fila-datos { flex-wrap: wrap; row-gap: 2px; }
+
+/* ---------- Foto en las reseñas ---------- */
+.resena-foto {
+  margin-top: 10px;
+  max-width: 260px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--linea);
+}
+.campo-foto { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.campo-foto input[type="file"] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.vista-previa { position: relative; }
+.vista-previa img {
+  width: 88px; height: 88px;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  border: 1px solid var(--linea);
+}
+.vista-previa button {
+  position: absolute;
+  top: -8px; right: -8px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 0;
+  display: grid; place-items: center;
+  background: var(--tinta);
+  color: var(--porcelana);
+  cursor: pointer;
+}
+.vista-previa button .icono { width: 14px; height: 14px; }
+
+/* ---------- Contenido compartido desde otra app ---------- */
+.compartido {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.compartido img {
+  width: 96px; height: 96px;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  flex: none;
+}
+.compartido p { overflow-wrap: anywhere; }
+.elegir-lugar { width: 100%; text-align: left; background: none; border: 0; font: inherit; cursor: pointer; }
+
 /* ---------- Ajustes ---------- */
 .ajustes { max-width: 680px; }
 .ajuste {

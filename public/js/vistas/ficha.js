@@ -3,6 +3,8 @@ import {
   escaparHTML, estrellas, mostrarAviso, calificacionHTML, precioTexto, fechaCorta, iniciales,
 } from '../util.js';
 import { icono } from '../iconos.js';
+import { imgFoto, creditoFoto, ANCHOS } from '../fotos.js';
+import { horarioHTML } from '../horario.js';
 import { guardarResena, resenasLocales, resenasRemotas } from '../resenas.js';
 import { compartir } from '../dispositivo.js';
 
@@ -18,13 +20,16 @@ export async function vistaFicha(contenedor, { id }) {
 
   contenedor.innerHTML = `
     <a class="volver" href="#/catalogo">${icono.volver}Catálogo</a>
-    <header class="ficha-cabecera" style="--c:${lugar.color}">
+    <header class="ficha-cabecera ${lugar.foto ? 'con-foto' : ''}" style="--c:${lugar.color}">
+      ${imgFoto(lugar.foto, { ancho: ANCHOS.portada, clase: 'portada-foto', perezosa: false })}
       <h1>${escaparHTML(lugar.nombre)}</h1>
       <div class="resumen">
         ${calificacionHTML(lugar.calificacion)}
         <span>${precioTexto(lugar.precio)} (${lugar.precio})</span>
+        ${horarioHTML(lugar)}
       </div>
     </header>
+    ${lugar.foto ? `<p class="credito">${creditoFoto(lugar.foto)}</p>` : ''}
 
     <div class="ficha-cuerpo">
       <div>

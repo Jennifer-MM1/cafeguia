@@ -1,6 +1,7 @@
 import { obtenerCatalogo } from '../api.js';
 import { filaLugar, escaparHTML } from '../util.js';
 import { icono } from '../iconos.js';
+import { estaAbierto } from '../horario.js';
 import { leerPreferencias, guardarPreferencia } from '../preferencias.js';
 
 const ORDENES = {
@@ -21,6 +22,7 @@ export async function vistaCatalogo(contenedor) {
   const estado = {
     texto: params.get('q') || '',
     etiqueta: params.get('etiqueta') || '',
+    abiertas: params.get('abiertas') === '1',
     orden: ORDENES[leerPreferencias().orden] ? leerPreferencias().orden : 'calificacion',
   };
 
@@ -34,7 +36,8 @@ export async function vistaCatalogo(contenedor) {
       <label for="buscar" class="solo-lector">Buscar cafetería</label>
       <input id="buscar" type="search" placeholder="Nombre, dirección o etiqueta" autocomplete="off">
     </div>
-    <div class="chips" role="group" aria-label="Filtrar por etiqueta">
+    <div class="chips" role="group" aria-label="Filtrar">
+      <button class="chip" type="button" id="chip-abiertas">Abierto ahora</button>
       ${etiquetas.map((e) => `<button class="chip" type="button" data-etiqueta="${escaparHTML(e)}">${escaparHTML(e)}</button>`).join('')}
     </div>
     <div class="seccion-titulo" style="margin-top:18px">
@@ -49,7 +52,8 @@ export async function vistaCatalogo(contenedor) {
   const buscar = contenedor.querySelector('#buscar');
   const resultados = contenedor.querySelector('#resultados');
   const contador = contenedor.querySelector('#contador');
-  const chips = contenedor.querySelectorAll('.chip');
+  const chips = contenedor.querySelectorAll('.chip[data-etiqueta]');
+  const chipAbiertas = contenedor.querySelector('#chip-abiertas');
   const orden = contenedor.querySelector('#orden');
   buscar.value = estado.texto;
   orden.value = estado.orden;
@@ -57,11 +61,13 @@ export async function vistaCatalogo(contenedor) {
   const pintar = () => {
     const t = estado.texto.trim().toLowerCase();
     const filtrados = catalogo
+      .filter((l) => !estado.abiertas || estaAbierto(l))
       .filter((l) => !estado.etiqueta || l.etiquetas.includes(estado.etiqueta))
       .filter((l) => !t || [l.nombre, l.direccion, ...l.etiquetas].some((c) => c.toLowerCase().includes(t)))
       .sort(ORDENES[estado.orden].fn);
 
     chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.etiqueta === estado.etiqueta)));
+    chipAbiertas.setAttribute('aria-pressed', String(estado.abiertas));
     contador.textContent = filtrados.length === 1 ? '1 cafetería' : `${filtrados.length} cafeterías`;
     resultados.innerHTML = filtrados.length
       ? `<ul class="directorio">${filtrados.map((l) => filaLugar(l)).join('')}</ul>`
@@ -73,6 +79,7 @@ export async function vistaCatalogo(contenedor) {
     resultados.querySelector('#limpiar')?.addEventListener('click', () => {
       estado.texto = '';
       estado.etiqueta = '';
+      estado.abiertas = false;
       buscar.value = '';
       pintar();
     });
@@ -89,6 +96,7 @@ export async function vistaCatalogo(contenedor) {
     const fila = activo.parentElement;
     fila.scrollLeft = activo.offsetLeft - fila.offsetLeft - 16;
   }
+  chipAbiertas.addEventListener('click', () => { estado.abiertas = !estado.abiertas; pintar(); });
   orden.addEventListener('change', () => {
     estado.orden = orden.value;
     guardarPreferencia('orden', orden.value); // Fase 6.2: se recuerda en localStorage

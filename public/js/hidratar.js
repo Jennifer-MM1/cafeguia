@@ -6,6 +6,7 @@ import { aplicarTema } from './preferencias.js';
 import { compartir, vibrar } from './dispositivo.js';
 import { mostrarAviso } from './util.js';
 import { icono } from './iconos.js';
+import { horarioHTML } from './horario.js';
 
 const db = self.CafeDB;
 
@@ -43,6 +44,10 @@ function hidratar() {
   });
 
   acciones.prepend(btnFav, btnCompartir);
+
+  // 3) Abierto/cerrado: depende de la hora actual, por eso lo calcula el cliente
+  const horario = document.getElementById('horario-ssr');
+  if (horario) horario.outerHTML = horarioHTML(lugar);
 
   // Marca visible de que la página ya es interactiva
   const marca = document.getElementById('estado-ssr');

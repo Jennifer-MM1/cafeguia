@@ -9,10 +9,15 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v14';
+const VERSION = 'v15';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
+// Las fotos de Unsplash no cambian: su caché no lleva versión y sobrevive a las actualizaciones
+const CACHE_FOTOS = 'cafeguia-fotos';
+const ORIGEN_FOTOS = 'https://images.unsplash.com';
+// Mismo formato que public/js/fotos.js (miniatura y portada)
+const fotoURL = (src, ancho) => `${src}?w=${ancho}&q=70&fm=jpg&fit=crop`;
 
 // App shell: todo lo necesario para arrancar sin red
 const ARCHIVOS_SHELL = [
@@ -27,6 +32,8 @@ const ARCHIVOS_SHELL = [
   './js/api.js',
   './js/util.js',
   './js/iconos.js',
+  './js/fotos.js',
+  './js/horario.js',
   './fonts/bricolage-grotesque.woff2',
   './js/instalacion.js',
   './js/preferencias.js',
@@ -49,16 +56,35 @@ const ARCHIVOS_SHELL = [
 // install: guarda el shell
 // ---------------------------------------------------------------------
 self.addEventListener('install', (evento) => {
-  evento.waitUntil(
-    caches.open(CACHE_SHELL).then((cache) => cache.addAll(ARCHIVOS_SHELL))
-  );
+  evento.waitUntil(Promise.all([
+    caches.open(CACHE_SHELL).then((cache) => cache.addAll(ARCHIVOS_SHELL)),
+    guardarFotosDelCatalogo(),
+  ]));
 });
+
+// Descarga las fotos del catálogo para que se vean sin conexión.
+// Si alguna falla (sin red, bloqueada) no se cancela la instalación.
+async function guardarFotosDelCatalogo() {
+  try {
+    const catalogo = await (await fetch('./data/catalogo.json')).json();
+    const cache = await caches.open(CACHE_FOTOS);
+    const urls = catalogo.filter((l) => l.foto)
+      .flatMap((l) => [fotoURL(l.foto.src, 480), fotoURL(l.foto.src, 1200)]);
+    await Promise.allSettled(urls.map(async (url) => {
+      if (await cache.match(url)) return;
+      const r = await fetch(url, { mode: 'cors' });
+      if (r.ok) await cache.put(url, r);
+    }));
+  } catch (e) {
+    console.warn('[SW] no se pudieron guardar las fotos', e);
+  }
+}
 
 // ---------------------------------------------------------------------
 // activate: borra cachés de versiones anteriores
 // ---------------------------------------------------------------------
 self.addEventListener('activate', (evento) => {
-  const vigentes = [CACHE_SHELL, CACHE_DATOS, CACHE_RECURSOS];
+  const vigentes = [CACHE_SHELL, CACHE_DATOS, CACHE_RECURSOS, CACHE_FOTOS];
   evento.waitUntil(
     caches.keys().then((nombres) => Promise.all(
       nombres.filter((n) => n.startsWith('cafeguia-') && !vigentes.includes(n))
@@ -120,12 +146,27 @@ async function staleWhileRevalidate(request) {
   return enCache || actualizacion;
 }
 
+async function fotoDesdeCache(request) {
+  const cache = await caches.open(CACHE_FOTOS);
+  const enCache = await cache.match(request.url);
+  if (enCache) return enCache;
+  const respuesta = await fetch(request);
+  if (respuesta.ok) cache.put(request.url, respuesta.clone()); // solo CORS: las opacas no son "ok"
+  return respuesta;
+}
+
 // ---------------------------------------------------------------------
 // fetch: decide qué estrategia usar en cada petición
 // ---------------------------------------------------------------------
 self.addEventListener('fetch', (evento) => {
   const { request } = evento;
   const url = new URL(request.url);
+
+  // Fotos de Unsplash → cache first (sus URLs nunca cambian de contenido)
+  if (request.method === 'GET' && url.origin === ORIGEN_FOTOS) {
+    evento.respondWith(fotoDesdeCache(request));
+    return;
+  }
 
   // Solo GET del mismo origen. Los POST (reseñas, push) van directo a la red.
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;

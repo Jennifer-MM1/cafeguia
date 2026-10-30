@@ -32,6 +32,7 @@ export async function vistaInicio(contenedor) {
         <input id="q" name="q" type="search" placeholder="Busca una cafetería" autocomplete="off">
       </form>
       <div class="chips">
+        <a class="chip" href="#/catalogo?abiertas=1" style="display:inline-flex;align-items:center;text-decoration:none">Abierto ahora</a>
         ${ATAJOS.map((a) => `<a class="chip" href="#/catalogo?etiqueta=${encodeURIComponent(a.etiqueta)}"
           style="display:inline-flex;align-items:center;text-decoration:none">${a.texto}</a>`).join('')}
       </div>

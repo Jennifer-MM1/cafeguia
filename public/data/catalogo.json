@@ -6,12 +6,35 @@
     "direccion": "Av. Juárez 12, Centro",
     "horario": "Lun–Sáb 8:00–21:00",
     "precio": "$$",
-    "etiquetas": ["especialidad", "wifi", "pan artesanal"],
-    "emoji": "☕",
+    "etiquetas": [
+      "especialidad",
+      "wifi",
+      "pan artesanal"
+    ],
     "color": "#6f4228",
     "calificacion": 4.7,
     "lat": 20.3889,
-    "lng": -99.9958
+    "lng": -99.9958,
+    "horarios": [
+      {
+        "dias": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "08:00",
+        "cierra": "21:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1545418314-7ce0b9b53901",
+      "autor": "Jonathan Borba",
+      "pagina": "https://unsplash.com/photos/21tOEaJPM_o",
+      "alt": "Máquina de espresso y molino bajo un menú de pizarra"
+    }
   },
   {
     "id": 2,
@@ -20,12 +43,36 @@
     "direccion": "Calle Hidalgo 45, Centro",
     "horario": "Todos los días 7:30–20:00",
     "precio": "$",
-    "etiquetas": ["familiar", "desayunos", "pet friendly"],
-    "emoji": "🥐",
+    "etiquetas": [
+      "familiar",
+      "desayunos",
+      "pet friendly"
+    ],
     "color": "#9c3a2e",
     "calificacion": 4.4,
     "lat": 20.3871,
-    "lng": -99.9935
+    "lng": -99.9935,
+    "horarios": [
+      {
+        "dias": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "07:30",
+        "cierra": "20:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1738605489199-4d39b213ae3b",
+      "autor": "julian urrutia",
+      "pagina": "https://unsplash.com/photos/tgYVVRlxb3M",
+      "alt": "Rebanada de pan dulce junto a una taza de café"
+    }
   },
   {
     "id": 3,
@@ -34,12 +81,34 @@
     "direccion": "Blvd. Hidalgo 210",
     "horario": "Lun–Vie 9:00–22:00",
     "precio": "$$",
-    "etiquetas": ["estudiar", "wifi", "cold brew"],
-    "emoji": "📚",
+    "etiquetas": [
+      "estudiar",
+      "wifi",
+      "cold brew"
+    ],
     "color": "#1f5a44",
     "calificacion": 4.6,
     "lat": 20.3925,
-    "lng": -100.0012
+    "lng": -100.0012,
+    "horarios": [
+      {
+        "dias": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "abre": "09:00",
+        "cierra": "22:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1565650839149-2c48a094196c",
+      "autor": "99.films",
+      "pagina": "https://unsplash.com/photos/yr9l_xQPDL0",
+      "alt": "Mesas de madera junto a una banca larga en un salón tranquilo"
+    }
   },
   {
     "id": 4,
@@ -48,12 +117,35 @@
     "direccion": "Paseo Central 8",
     "horario": "Mar–Dom 10:00–19:00",
     "precio": "$$$",
-    "etiquetas": ["tostador", "para llevar", "especialidad"],
-    "emoji": "🫘",
+    "etiquetas": [
+      "tostador",
+      "para llevar",
+      "especialidad"
+    ],
     "color": "#2e2a27",
     "calificacion": 4.8,
     "lat": 20.3958,
-    "lng": -99.9897
+    "lng": -99.9897,
+    "horarios": [
+      {
+        "dias": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "10:00",
+        "cierra": "19:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1773118360501-00f979fd9322",
+      "autor": "Ichsan Chairul",
+      "pagina": "https://unsplash.com/photos/iwcZmTKFo0w",
+      "alt": "Granos recién tostados girando en la tostadora"
+    }
   },
   {
     "id": 5,
@@ -62,12 +154,36 @@
     "direccion": "Jardín Independencia 3",
     "horario": "Todos los días 11:00–23:00",
     "precio": "$$",
-    "etiquetas": ["terraza", "postres", "café de olla"],
-    "emoji": "🌿",
+    "etiquetas": [
+      "terraza",
+      "postres",
+      "café de olla"
+    ],
     "color": "#4a6630",
     "calificacion": 4.3,
     "lat": 20.388,
-    "lng": -99.997
+    "lng": -99.997,
+    "horarios": [
+      {
+        "dias": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "abre": "11:00",
+        "cierra": "23:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1596910715979-6a1ef3bb0731",
+      "autor": "Chris J. Davis",
+      "pagina": "https://unsplash.com/photos/OA5JbQDEYHg",
+      "alt": "Patio al aire libre con mesas, sillas y sombrillas"
+    }
   },
   {
     "id": 6,
@@ -76,11 +192,33 @@
     "direccion": "Av. La Palma 105",
     "horario": "Lun–Vie 7:00–18:00",
     "precio": "$",
-    "etiquetas": ["rápido", "estudiantes", "para llevar"],
-    "emoji": "🎓",
+    "etiquetas": [
+      "rápido",
+      "estudiantes",
+      "para llevar"
+    ],
     "color": "#2c4d78",
     "calificacion": 4.1,
     "lat": 20.379,
-    "lng": -100.009
+    "lng": -100.009,
+    "horarios": [
+      {
+        "dias": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "abre": "07:00",
+        "cierra": "18:00"
+      }
+    ],
+    "foto": {
+      "src": "https://images.unsplash.com/photo-1464979681340-bdd28a61699e",
+      "autor": "Robert Bye",
+      "pagina": "https://unsplash.com/photos/F2eHfMwIOxA",
+      "alt": "Clientes pidiendo en la barra de una cafetería"
+    }
   }
 ]

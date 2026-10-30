@@ -1,5 +1,7 @@
 // Utilidades compartidas por las vistas
 import { icono } from './iconos.js';
+import { imgFoto } from './fotos.js';
+import { horarioHTML } from './horario.js';
 
 const ENTIDADES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 
@@ -40,11 +42,12 @@ export function mostrarAviso(texto, ms = 3500) {
   setTimeout(() => aviso.remove(), ms);
 }
 
-// Etiqueta grande de la portada (el nombre del lugar es la imagen)
+// Etiqueta grande de la portada: foto de fondo con el nombre encima
 export function selloLugar(lugar) {
   return `
     <a class="sello" href="#/lugar/${lugar.id}" style="--c:${lugar.color}">
-      <span class="sello-arriba"><span>${escaparHTML(lugar.etiquetas[0])}</span><span>${lugar.precio}</span></span>
+      ${imgFoto(lugar.foto, { clase: 'sello-foto' })}
+      <span class="sello-arriba">${horarioHTML(lugar)}<span>${lugar.precio}</span></span>
       <span class="sello-nombre">${escaparHTML(lugar.nombre)}</span>
       <span class="sello-pie">
         <span>${escaparHTML(lugar.direccion)}</span>
@@ -58,13 +61,15 @@ export function filaLugar(lugar, lado = icono.ir) {
   return `
     <li>
       <a class="fila" href="#/lugar/${lugar.id}">
-        <span class="fila-sello" style="--c:${lugar.color}" aria-hidden="true">${iniciales(lugar.nombre)}</span>
+        <span class="fila-sello" style="--c:${lugar.color}" aria-hidden="true">${lugar.foto
+          ? imgFoto({ ...lugar.foto, alt: '' }) : iniciales(lugar.nombre)}</span>
         <span class="fila-info">
           <h3>${escaparHTML(lugar.nombre)}</h3>
           <p>${escaparHTML(lugar.direccion)}</p>
           <span class="fila-datos">
             ${calificacionHTML(lugar.calificacion)}
             <span class="precio" title="${precioTexto(lugar.precio)}">${lugar.precio}</span>
+            ${horarioHTML(lugar)}
           </span>
         </span>
         <span class="fila-lado">${lado}</span>

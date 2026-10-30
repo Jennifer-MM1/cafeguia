@@ -6,6 +6,9 @@ const ENTIDADES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": 
 const esc = (t = '') => String(t).replace(/[&<>"']/g, (c) => ENTIDADES[c]);
 const estrellas = (v) => '★'.repeat(Math.round(v)) + '☆'.repeat(5 - Math.round(v));
 const PRECIOS = { $: 'Económico', $$: 'Precio medio', $$$: 'Precio alto' };
+// Mismo formato de URL que public/js/fotos.js para aprovechar la caché del service worker
+const fotoURL = (src, ancho) => `${src}?w=${ancho}&q=70&fm=jpg&fit=crop`;
+const UTM = 'utm_source=cafeguia&utm_medium=referral';
 const fecha = (iso) => new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
 
 // Los mismos íconos que public/js/iconos.js (el servidor no puede importar módulos del navegador)
@@ -71,13 +74,18 @@ function renderFicha(lugar, resenas = []) {
 
   <main class="vista" id="ficha-ssr" data-lugar-id="${lugar.id}">
     <a class="volver" href="./#/catalogo">${ICONO.volver}Catálogo</a>
-    <header class="ficha-cabecera" style="--c:${lugar.color}">
+    <header class="ficha-cabecera ${lugar.foto ? 'con-foto' : ''}" style="--c:${lugar.color}">
+      ${lugar.foto ? `<img class="portada-foto" src="${fotoURL(lugar.foto.src, 1200)}" alt="${esc(lugar.foto.alt)}" crossorigin="anonymous" fetchpriority="high">` : ''}
       <h1>${esc(lugar.nombre)}</h1>
       <div class="resumen">
         <span class="calificacion" aria-label="Calificación ${lugar.calificacion} de 5">${ICONO.estrella}${Number(lugar.calificacion).toFixed(1)}</span>
         <span>${PRECIOS[lugar.precio] || ''} (${lugar.precio})</span>
+        <!-- El estado abierto/cerrado depende de la hora: lo agrega la hidratación -->
+        <span id="horario-ssr"></span>
       </div>
     </header>
+    ${lugar.foto ? `<p class="credito">Foto de <a href="${lugar.foto.pagina}?${UTM}" target="_blank" rel="noopener">${esc(lugar.foto.autor)}</a>
+      en <a href="https://unsplash.com/?${UTM}" target="_blank" rel="noopener">Unsplash</a></p>` : ''}
 
     <div class="ficha-cuerpo">
       <div>
