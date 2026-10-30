@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sin conexión · CaféGuía</title>
+  <meta name="theme-color" content="#2b1a12">
+  <!-- Estilos en línea: esta página debe verse bien aunque falle todo lo demás -->
+  <style>
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #2b1a12; color: #f6efe6; text-align: center; padding: 24px;
+    }
+    .icono { font-size: 4rem; }
+    h1 { margin: 8px 0; }
+    p { opacity: .85; max-width: 32ch; margin: 8px auto; }
+    a, button {
+      display: inline-block; margin-top: 16px; padding: 10px 18px; border: 0;
+      border-radius: 10px; background: #d9822b; color: #fff; font: inherit;
+      font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="icono" aria-hidden="true">☕🔌</div>
+    <h1>Sin conexión</h1>
+    <p>Esta página no se ha guardado todavía en tu dispositivo.</p>
+    <p>Puedes seguir usando el catálogo y escribir reseñas: se enviarán solas cuando vuelva internet.</p>
+    <a href="./">Ir al inicio</a>
+    <button onclick="location.reload()">Reintentar</button>
+  </main>
+  <script>
+    // Recarga automática al recuperar la conexión
+    window.addEventListener('online', () => location.reload());
+  </script>
+</body>
+</html>

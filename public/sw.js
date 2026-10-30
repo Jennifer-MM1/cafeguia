@@ -1,52 +1,142 @@
-// Fase 3.2 · Service worker básico con los tres eventos base.
-const VERSION = 'v4';
-const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
+// =====================================================================
+// CaféGuía · Service worker
+// Fase 3: eventos base · Fase 7: estrategias de caché y offline
+// =====================================================================
 
+// Cambia este número en cada publicación: el navegador detecta un sw.js
+// distinto, instala la versión nueva y se borran las cachés viejas.
+const VERSION = 'v5';
+const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
+const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
+const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
+
+// App shell: todo lo necesario para arrancar sin red
 const ARCHIVOS_SHELL = [
   './',
   './index.html',
+  './offline.html',
   './css/estilos.css',
   './js/app.js',
+  './js/db.js',
   './js/registro-sw.js',
   './js/enrutador.js',
   './js/api.js',
   './js/util.js',
   './js/instalacion.js',
-  './js/db.js',
   './js/preferencias.js',
+  './js/conexion.js',
   './js/vistas/inicio.js',
   './js/vistas/catalogo.js',
   './js/vistas/ficha.js',
   './js/vistas/cerca.js',
   './js/vistas/ajustes.js',
-  './data/catalogo.json',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
 ];
 
-// 1) install: se descarga y guarda el app shell
+// ---------------------------------------------------------------------
+// install: guarda el shell
+// ---------------------------------------------------------------------
 self.addEventListener('install', (evento) => {
-  console.log('[SW] install', VERSION);
   evento.waitUntil(
     caches.open(CACHE_SHELL).then((cache) => cache.addAll(ARCHIVOS_SHELL))
   );
 });
 
-// 2) activate: se borran cachés de versiones anteriores
+// ---------------------------------------------------------------------
+// activate: borra cachés de versiones anteriores
+// ---------------------------------------------------------------------
 self.addEventListener('activate', (evento) => {
-  console.log('[SW] activate', VERSION);
+  const vigentes = [CACHE_SHELL, CACHE_DATOS, CACHE_RECURSOS];
   evento.waitUntil(
-    caches.keys().then((nombres) =>
-      Promise.all(nombres.filter((n) => n !== CACHE_SHELL).map((n) => caches.delete(n)))
-    )
+    caches.keys().then((nombres) => Promise.all(
+      nombres.filter((n) => n.startsWith('cafeguia-') && !vigentes.includes(n))
+        .map((n) => caches.delete(n))
+    ))
   );
 });
 
-// 3) fetch: primero la caché, si no está se va a la red
+// ---------------------------------------------------------------------
+// Las tres estrategias
+// ---------------------------------------------------------------------
+
+// 1) Cache first: para el shell, que casi nunca cambia (cambia con VERSION).
+async function primeroCache(request) {
+  const enCache = await caches.match(request, { ignoreSearch: true });
+  if (enCache) return enCache;
+  const respuesta = await fetch(request);
+  if (respuesta.ok) (await caches.open(CACHE_SHELL)).put(request, respuesta.clone());
+  return respuesta;
+}
+
+// 2) Network first: para datos (catálogo, reseñas, páginas SSR).
+//    Siempre se intenta lo más reciente; si no hay red, se usa la última copia.
+async function primeroRed(request, nombreCache = CACHE_DATOS) {
+  const cache = await caches.open(nombreCache);
+  try {
+    const respuesta = await fetch(request);
+    if (respuesta.ok) cache.put(request, respuesta.clone());
+    return respuesta;
+  } catch (error) {
+    const enCache = await cache.match(request);
+    if (enCache) return enCache;
+    throw error;
+  }
+}
+
+// 3) Stale-while-revalidate: para íconos e imágenes.
+//    Responde al instante con la caché y la actualiza en segundo plano.
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_RECURSOS);
+  const enCache = await cache.match(request);
+  const actualizacion = fetch(request).then((respuesta) => {
+    if (respuesta.ok) cache.put(request, respuesta.clone());
+    return respuesta;
+  }).catch(() => enCache);
+  return enCache || actualizacion;
+}
+
+// ---------------------------------------------------------------------
+// fetch: decide qué estrategia usar en cada petición
+// ---------------------------------------------------------------------
 self.addEventListener('fetch', (evento) => {
-  if (evento.request.method !== 'GET') return;
-  evento.respondWith(
-    caches.match(evento.request).then((respuesta) => respuesta || fetch(evento.request))
-  );
+  const { request } = evento;
+  const url = new URL(request.url);
+
+  // Solo GET del mismo origen. Los POST (reseñas, push) van directo a la red.
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  // Datos: API y catálogo estático → network first
+  if (url.pathname.includes('/api/') || url.pathname.endsWith('/data/catalogo.json')) {
+    evento.respondWith(primeroRed(request));
+    return;
+  }
+
+  // Navegación (el usuario abre una URL)
+  if (request.mode === 'navigate') {
+    // Páginas SSR /lugar/:id → network first; sin red y sin copia → offline.html
+    if (url.pathname.includes('/lugar/')) {
+      evento.respondWith(
+        primeroRed(request).catch(() => caches.match('./offline.html'))
+      );
+      return;
+    }
+    // Cualquier otra navegación es el shell (index.html) → cache first
+    evento.respondWith(
+      caches.match('./index.html')
+        .then((r) => r || fetch(request))
+        .catch(() => caches.match('./offline.html'))
+    );
+    return;
+  }
+
+  // Imágenes e íconos → stale-while-revalidate
+  if (request.destination === 'image') {
+    evento.respondWith(staleWhileRevalidate(request));
+    return;
+  }
+
+  // CSS, JS y demás archivos del shell → cache first
+  evento.respondWith(primeroCache(request));
 });
