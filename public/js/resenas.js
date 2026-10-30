@@ -22,7 +22,7 @@ export async function resenasRemotas(lugarId) {
   }
 }
 
-export async function guardarResena({ lugarId, autor, calificacion, texto }) {
+export async function guardarResena({ lugarId, autor, calificacion, texto, foto = null }) {
   const resena = {
     idCliente: crypto.randomUUID(), // evita duplicados si el envío se reintenta
     lugarId: Number(lugarId),
@@ -32,7 +32,10 @@ export async function guardarResena({ lugarId, autor, calificacion, texto }) {
     fecha: new Date().toISOString(),
     estado: 'pendiente',
   };
+  // IndexedDB guarda el Blob tal cual: la foto queda en el teléfono hasta subirse
+  if (foto) resena.foto = foto;
   await db.guardar('resenas', resena);
+  await db.actualizarInsignia();
   await programarEnvio();
   return resena;
 }
@@ -74,6 +77,7 @@ export function iniciarSincronizacion() {
     if (!syncDisponible) enviarDesdeLaPagina();
   });
   // Reseñas que quedaron pendientes de una visita anterior
+  db.actualizarInsignia();
   db.porIndice('resenas', 'porEstado', 'pendiente').then((p) => {
     if (p.length && navigator.onLine) programarEnvio();
   });

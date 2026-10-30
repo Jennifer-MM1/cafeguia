@@ -60,4 +60,28 @@ router.post('/', (req, res) => {
   eventos.emit('nueva-resena', nueva); // la Fase 10 la usa para enviar un push
 });
 
-module.exports = { router, resenasDe, eventos };
+// Extra · PUT /api/resenas/:id/foto  (cuerpo: la imagen en binario)
+// Se usa PUT porque reemplaza siempre el mismo recurso: repetirlo no duplica nada.
+const CARPETA_FOTOS = path.join(__dirname, '..', 'data', 'fotos');
+const EXTENSIONES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+
+router.put('/:id/foto',
+  express.raw({ type: Object.keys(EXTENSIONES), limit: '6mb' }),
+  (req, res) => {
+    const extension = EXTENSIONES[req.get('Content-Type')];
+    if (!extension || !Buffer.isBuffer(req.body) || !req.body.length) {
+      return res.status(415).json({ error: 'Envía una imagen JPEG, PNG o WebP' });
+    }
+    const resenas = leer();
+    const resena = resenas.find((r) => r.id === Number(req.params.id));
+    if (!resena) return res.status(404).json({ error: 'Reseña no encontrada' });
+
+    fs.mkdirSync(CARPETA_FOTOS, { recursive: true });
+    const archivo = `resena-${resena.id}.${extension}`;
+    fs.writeFileSync(path.join(CARPETA_FOTOS, archivo), req.body);
+    resena.foto = `fotos/${archivo}`;
+    escribir(resenas);
+    res.json(resena);
+  });
+
+module.exports = { router, resenasDe, eventos, CARPETA_FOTOS };

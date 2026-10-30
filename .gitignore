@@ -6,6 +6,7 @@ node_modules/
 vapid.json
 data/resenas.json
 data/suscripciones.json
+data/fotos/
 
 # Sistema / editor
 .DS_Store

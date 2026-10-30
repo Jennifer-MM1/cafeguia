@@ -134,7 +134,31 @@ git commit -m "Fase N: descripción"
 - **11.3** `hidratar.js` toma el HTML del SSR y le conecta favoritos y compartir **sin volver a pintarlo**.
 
 ### Fase 12 · Pruebas
-Llena [docs/PRUEBAS.md](docs/PRUEBAS.md): herramientas, 30 casos de prueba y Lighthouse.
+Llena [docs/PRUEBAS.md](docs/PRUEBAS.md): herramientas, casos de prueba y Lighthouse.
+
+---
+
+## Funciones extra
+
+| Función | Archivos | Qué demuestra |
+|---|---|---|
+| **Fotografías reales** | `data/catalogo.json`, `js/fotos.js`, `sw.js` | Imágenes de otro origen (Unsplash) con CORS; el SW las precarga al instalarse en una caché sin versión (`cafeguia-fotos`) para verlas sin conexión |
+| **Abierto ahora** | `js/horario.js` | Lógica sin red con la zona horaria de la ciudad (`Intl`, `America/Mexico_City`); filtro en el catálogo; en la ficha SSR lo agrega la hidratación porque depende de la hora |
+| **Fotos en las reseñas** | `js/imagen.js`, `js/db.js`, `server/resenas.js` | Cámara o galería, compresión con `<canvas>`, Blob guardado en IndexedDB y subida en dos pasos idempotentes (`POST` de la reseña + `PUT /api/resenas/:id/foto`) al reconectar |
+| **Compartir hacia CaféGuía** | `manifest.json` (`share_target`), `sw.js`, `js/vistas/compartir.js` | Web Share Target: el SW recibe el `POST` con la foto, la guarda en IndexedDB y redirige con `303`. Funciona también en GitHub Pages porque no toca el servidor |
+| **Contador en el ícono** | `js/db.js` (`actualizarInsignia`) | Badging API (`setAppBadge`): número de reseñas por publicar en el ícono de la app instalada, actualizado desde la página y desde el SW |
+
+**Créditos de las fotografías:** Jonathan Borba, julian urrutia, 99.films, Ichsan Chairul, Chris J. Davis y Robert Bye, en [Unsplash](https://unsplash.com) (Licencia Unsplash). Cada foto muestra su crédito en la ficha de la cafetería. Son ilustrativas: las cafeterías de la guía son ficticias.
+
+**Cómo probar «Compartir»:** instala la app en Android, abre la galería, toca *Compartir* en una foto y elige CaféGuía. En escritorio puedes simularlo desde la consola:
+
+```js
+const fd = new FormData();
+fd.append('texto', 'Probando');
+fd.append('foto', await (await fetch('icons/icon-512.png')).blob(), 'foto.png');
+await fetch('./compartir-destino', { method: 'POST', body: fd, redirect: 'manual' });
+location.hash = '#/compartir';
+```
 
 ---
 

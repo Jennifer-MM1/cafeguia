@@ -5,13 +5,15 @@ import { vistaCatalogo } from './vistas/catalogo.js';
 import { vistaFicha } from './vistas/ficha.js';
 import { vistaCerca } from './vistas/cerca.js';
 import { vistaAjustes } from './vistas/ajustes.js';
+import { vistaCompartir } from './vistas/compartir.js';
 
 const RUTAS = [
   { patron: /^\/$/, nombre: 'inicio', vista: vistaInicio },
   { patron: /^\/catalogo(\?.*)?$/, nombre: 'catalogo', vista: vistaCatalogo },
-  { patron: /^\/lugar\/(?<id>\d+)$/, nombre: 'catalogo', vista: vistaFicha },
+  { patron: /^\/lugar\/(?<id>\d+)(\?.*)?$/, nombre: 'catalogo', vista: vistaFicha },
   { patron: /^\/cerca$/, nombre: 'cerca', vista: vistaCerca },
   { patron: /^\/ajustes$/, nombre: 'ajustes', vista: vistaAjustes },
+  { patron: /^\/compartir$/, nombre: '', vista: vistaCompartir },
 ];
 
 async function resolver() {

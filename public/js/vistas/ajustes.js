@@ -111,6 +111,8 @@ export async function vistaAjustes(contenedor) {
         ${fila('Cafeterías disponibles sin conexión', '', `<span class="ajuste-valor">${catalogo.length}</span>`)}
         ${fila('Guardadas', '', `<span class="ajuste-valor">${favoritos.length}</span>`)}
         ${fila('Reseñas por publicar', pendientes ? 'Se publican solas al reconectar.' : '', `<span class="ajuste-valor">${pendientes}</span>`)}
+        ${fila('Contador en el ícono', 'En la app instalada, el ícono muestra cuántas reseñas faltan por publicar.',
+          `<span class="ajuste-valor">${'setAppBadge' in navigator ? 'Disponible' : 'No disponible'}</span>`)}
         ${fila('Espacio usado', '', `<span class="ajuste-valor">${espacio}</span>`)}
         ${fila('Versión de la app', '', `<span class="ajuste-valor">${await versionServiceWorker()}</span>`)}
         <div class="acciones">

@@ -3,12 +3,14 @@
 // y en el service worker con importScripts('js/db.js'). Expone self.CafeDB.
 (function (global) {
   const NOMBRE = 'cafeguia';
-  const VERSION = 1;
+  const VERSION = 2;
 
   // Almacenes (tablas):
-  //  - catalogo:  copia local de los datos remotos (respaldo offline)
-  //  - favoritos: cafeterías marcadas por el usuario
-  //  - resenas:   reseñas escritas en el dispositivo; estado = 'pendiente' | 'enviada'
+  //  - catalogo:    copia local de los datos remotos (respaldo offline)
+  //  - favoritos:   cafeterías marcadas por el usuario
+  //  - resenas:     reseñas escritas en el dispositivo; estado = 'pendiente' | 'enviada'.
+  //                 Pueden traer "foto" (un Blob JPEG) mientras no se suben.
+  //  - compartidos: lo último que otra app compartió hacia CaféGuía (versión 2)
   let promesaConexion = null;
 
   function abrir() {
@@ -30,8 +32,20 @@
           resenas.createIndex('porLugar', 'lugarId');
           resenas.createIndex('porEstado', 'estado');
         }
+        if (!db.objectStoreNames.contains('compartidos')) {
+          db.createObjectStore('compartidos', { keyPath: 'id' });
+        }
       };
-      solicitud.onsuccess = () => resolver(solicitud.result);
+      solicitud.onsuccess = () => {
+        const db = solicitud.result;
+        // Si otra pestaña (o el SW) abre una versión más nueva, cerramos esta
+        // conexión para no bloquear la actualización de la base de datos.
+        db.onversionchange = () => {
+          db.close();
+          promesaConexion = null;
+        };
+        resolver(db);
+      };
       solicitud.onerror = () => rechazar(solicitud.error);
     });
     return promesaConexion;
@@ -81,22 +95,54 @@
   // Fase 8 · Envía al servidor las reseñas pendientes. Lo usan tanto el evento
   // "sync" del service worker como la página (navegadores sin Background Sync).
   // Si alguna falla, lanza un error para que el navegador reintente el sync.
+  //
+  // Con foto son dos pasos: POST de la reseña (JSON) y PUT de la imagen (binario).
+  // Ambos son idempotentes: si falla el PUT, el reintento vuelve a hacer el POST
+  // (el servidor devuelve la misma reseña) y repite el PUT.
   CafeDB.enviarResenasPendientes = async function (url = 'api/resenas') {
     const pendientes = await CafeDB.porIndice('resenas', 'porEstado', 'pendiente');
     let enviadas = 0;
-    for (const resena of pendientes) {
-      const { idLocal, estado, ...datos } = resena;
-      const r = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datos),
-      });
-      if (!r.ok) throw new Error(`El servidor respondió ${r.status}`);
-      const guardada = await r.json();
-      await CafeDB.guardar('resenas', { ...resena, estado: 'enviada', idServidor: guardada.id });
-      enviadas++;
+    try {
+      for (const resena of pendientes) {
+        const { idLocal, estado, foto, ...datos } = resena;
+        const r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos),
+        });
+        if (!r.ok) throw new Error(`El servidor respondió ${r.status}`);
+        const guardada = await r.json();
+
+        if (foto) {
+          const rf = await fetch(`${url}/${guardada.id}/foto`, {
+            method: 'PUT',
+            headers: { 'Content-Type': foto.type || 'image/jpeg' },
+            body: foto,
+          });
+          if (!rf.ok) throw new Error(`No se pudo subir la foto (${rf.status})`);
+        }
+        // Ya está en el servidor: se borra el Blob para liberar espacio
+        await CafeDB.guardar('resenas', { ...datos, idLocal, estado: 'enviada', idServidor: guardada.id });
+        enviadas++;
+      }
+    } finally {
+      await CafeDB.actualizarInsignia();
     }
     return enviadas;
+  };
+
+  // Extra · Badging API: número de reseñas por publicar en el ícono de la app
+  // instalada. Funciona igual desde la página y desde el service worker.
+  CafeDB.actualizarInsignia = async function () {
+    const nav = global.navigator;
+    if (!nav || !('setAppBadge' in nav)) return;
+    try {
+      const n = (await CafeDB.porIndice('resenas', 'porEstado', 'pendiente')).length;
+      if (n) await nav.setAppBadge(n);
+      else await nav.clearAppBadge();
+    } catch {
+      // Sin permiso de notificaciones o app no instalada: no pasa nada
+    }
   };
 
   global.CafeDB = CafeDB;

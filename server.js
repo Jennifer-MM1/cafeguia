@@ -39,6 +39,8 @@ app.get('/api/catalogo/:id', (req, res) => {
 
 // Fase 8.1 · Reseñas
 app.use('/api/resenas', resenas.router);
+// Fotos que los usuarios suben con sus reseñas (nombre fijo por reseña: no caducan solas)
+app.use('/fotos', express.static(resenas.CARPETA_FOTOS, { maxAge: '7d' }));
 
 // Fase 10.3 · Notificaciones push
 app.use('/api/push', push.router);

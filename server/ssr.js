@@ -38,6 +38,7 @@ function renderResenas(resenas) {
             <span class="resena-fecha">${fecha(r.fecha)}</span>
           </div>
           <p>${esc(r.texto)}</p>
+          ${r.foto ? `<img class="resena-foto" src="${esc(r.foto)}" alt="Foto de la reseña de ${esc(r.autor)}" loading="lazy">` : ''}
         </div>
       </article>`).join('');
 }

@@ -57,6 +57,13 @@ Marca el resultado: ✅ pasa · ❌ falla · ➖ no aplica. Adjunta captura en c
 | CP-28 | 11 | Hidratación | Abrir `/lugar/2` | La pastilla dice «SSR + hidratada» y el botón de favorito funciona | | |
 | CP-29 | 12 | Lighthouse | Ejecutar Lighthouse (móvil) | Rendimiento ≥ 90, Accesibilidad ≥ 90, Buenas prácticas ≥ 90 | | |
 | CP-30 | 13 | GitHub Pages | Abrir la URL publicada | La app carga, se instala y funciona offline | | |
+| CP-31 | Extra | Fotos sin conexión | Abrir la app una vez → Network *Offline* → recargar | Las fotos de las cafeterías se ven; están en Cache Storage → `cafeguia-fotos` | | |
+| CP-32 | Extra | Abierto ahora | Catálogo → chip *Abierto ahora* | Solo quedan las abiertas según la hora de la Ciudad de México | | |
+| CP-33 | Extra | Horario en SSR | Abrir `/lugar/4` | El estado abierto/cerrado aparece después de la hidratación | | |
+| CP-34 | Extra | Reseña con foto | Ficha → *Agregar foto* → publicar | La foto aparece en la reseña y se guarda en `data/fotos/` | | |
+| CP-35 | Extra | Foto sin conexión | Offline → reseña con foto → volver a *Online* | Queda «Se publicará al reconectar» con su foto; al reconectar se suben reseña y foto | | |
+| CP-36 | Extra | Compartir hacia la app | Android: galería → Compartir → CaféGuía (o el código del README) | Abre «¿De qué cafetería es?»; al elegir una, el formulario trae el texto y la foto | | |
+| CP-37 | Extra | Contador en el ícono | App instalada → reseña sin conexión | El ícono muestra 1; al publicarse, desaparece | | |
 
 ### Puntuación Lighthouse
 

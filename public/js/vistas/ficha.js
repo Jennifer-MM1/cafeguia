@@ -7,6 +7,7 @@ import { imgFoto, creditoFoto, ANCHOS } from '../fotos.js';
 import { horarioHTML } from '../horario.js';
 import { guardarResena, resenasLocales, resenasRemotas } from '../resenas.js';
 import { compartir } from '../dispositivo.js';
+import { comprimirImagen } from '../imagen.js';
 
 export async function vistaFicha(contenedor, { id }) {
   const lugar = await obtenerLugar(id);
@@ -65,6 +66,16 @@ export async function vistaFicha(contenedor, { id }) {
           <label for="texto">Tu reseña</label>
           <textarea id="texto" name="texto" maxlength="500" required
             placeholder="¿Qué pediste? ¿Cómo estuvo el lugar?"></textarea>
+          <span class="etiqueta-campo">Foto (opcional)</span>
+          <div class="campo-foto">
+            <!-- Sin "capture": en el celular deja elegir entre la cámara y la galería -->
+            <input type="file" id="foto" accept="image/*">
+            <label for="foto" class="boton secundario" style="margin:0">${icono.camara}Agregar foto</label>
+            <div class="vista-previa" id="vista-previa" hidden>
+              <img alt="Foto que vas a publicar">
+              <button type="button" id="quitar-foto" aria-label="Quitar foto">${icono.cerrar}</button>
+            </div>
+          </div>
           <p class="ayuda">Puedes escribirla sin internet: se publica sola cuando vuelvas a tener conexión.</p>
           <div class="acciones"><button class="boton" type="submit">Publicar reseña</button></div>
         </form>
@@ -112,7 +123,18 @@ export async function vistaFicha(contenedor, { id }) {
   // Fase 8 · Reseñas: las del servidor + las locales que aún no se envían
   const lista = contenedor.querySelector('#lista-resenas');
   const titulo = contenedor.querySelector('#titulo-resenas');
+  // Foto pendiente: Blob local (URL temporal). Foto publicada: archivo del servidor.
+  const urlsTemporales = [];
+  const fotoResena = (r) => {
+    let src = r.foto;
+    if (r.foto instanceof Blob) {
+      src = URL.createObjectURL(r.foto);
+      urlsTemporales.push(src);
+    }
+    return src ? `<img class="resena-foto" src="${escaparHTML(src)}" alt="Foto de la reseña de ${escaparHTML(r.autor)}" loading="lazy">` : '';
+  };
   async function pintarResenas() {
+    urlsTemporales.splice(0).forEach((u) => URL.revokeObjectURL(u));
     const [remotas, locales] = await Promise.all([resenasRemotas(lugar.id), resenasLocales(lugar.id)]);
     const yaEnServidor = new Set(remotas.map((r) => r.idCliente));
     const pendientes = locales.filter((r) => r.estado === 'pendiente' && !yaEnServidor.has(r.idCliente));
@@ -130,18 +152,57 @@ export async function vistaFicha(contenedor, { id }) {
               : `<span class="resena-fecha">${fechaCorta(r.fecha)}</span>`}
           </div>
           <p>${escaparHTML(r.texto)}</p>
+          ${fotoResena(r)}
         </div>
       </article>`).join('')
       : '<p class="ayuda" style="padding:12px 0">Nadie ha escrito una reseña todavía. Cuéntanos cómo te fue.</p>';
   }
   await pintarResenas();
 
+  // Extra · Foto en la reseña: se comprime en el teléfono y se guarda como Blob
   const form = contenedor.querySelector('#form-resena');
+  const entradaFoto = contenedor.querySelector('#foto');
+  const vistaPrevia = contenedor.querySelector('#vista-previa');
+  let fotoElegida = null;
+  const ponerFoto = (blob) => {
+    fotoElegida = blob;
+    const img = vistaPrevia.querySelector('img');
+    if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+    vistaPrevia.hidden = !blob;
+    img.src = blob ? URL.createObjectURL(blob) : '';
+  };
+  // Si el usuario publica mientras la foto aún se procesa, el envío la espera
+  let procesando = Promise.resolve();
+  entradaFoto.addEventListener('change', () => {
+    const archivo = entradaFoto.files[0];
+    entradaFoto.value = '';
+    if (!archivo) return;
+    procesando = comprimirImagen(archivo)
+      .then(ponerFoto)
+      .catch((error) => mostrarAviso(error.message));
+  });
+  contenedor.querySelector('#quitar-foto').addEventListener('click', () => ponerFoto(null));
+
+  // Extra · Llegó contenido compartido desde otra app (#/lugar/3?compartido=1)
+  if (new URLSearchParams(location.hash.split('?')[1] || '').get('compartido')) {
+    const compartido = await self.CafeDB.obtener('compartidos', 'ultimo');
+    if (compartido) {
+      form.texto.value = [compartido.texto, compartido.enlace].filter(Boolean).join('\n');
+      // Las fotos compartidas llegan a tamaño original: se reducen igual que las de la cámara
+      if (compartido.foto) ponerFoto(await comprimirImagen(compartido.foto).catch(() => null));
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      form.texto.focus({ preventScroll: true });
+    }
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    await procesando;
     const datos = Object.fromEntries(new FormData(form));
-    await guardarResena({ lugarId: lugar.id, ...datos });
+    await guardarResena({ lugarId: lugar.id, ...datos, foto: fotoElegida });
+    await self.CafeDB.borrar('compartidos', 'ultimo');
     form.reset();
+    ponerFoto(null);
     mostrarAviso(navigator.onLine ? 'Publicando tu reseña…' : 'Sin conexión. Tu reseña se publicará al reconectar.');
     await pintarResenas();
   });

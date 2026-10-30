@@ -2,6 +2,7 @@
 // CaféGuía · Service worker
 // Fase 3: eventos base · Fase 7: estrategias de caché y offline
 // Fase 8: Background Sync · Fase 9: ciclo de vida · Fase 10: push
+// Extras: fotos en caché, Web Share Target y Badging
 // =====================================================================
 
 // La misma capa IndexedDB que usa la página (expone self.CafeDB)
@@ -9,7 +10,7 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v15';
+const VERSION = 'v19';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
@@ -47,6 +48,8 @@ const ARCHIVOS_SHELL = [
   './js/vistas/ficha.js',
   './js/vistas/cerca.js',
   './js/vistas/ajustes.js',
+  './js/vistas/compartir.js',
+  './js/imagen.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -168,6 +171,13 @@ self.addEventListener('fetch', (evento) => {
     return;
   }
 
+  // Extra · Web Share Target: otra app compartió algo hacia CaféGuía.
+  // El POST nunca llega a un servidor: lo atiende el SW (funciona en GitHub Pages).
+  if (request.method === 'POST' && url.pathname.endsWith('/compartir-destino')) {
+    evento.respondWith(recibirCompartido(request));
+    return;
+  }
+
   // Solo GET del mismo origen. Los POST (reseñas, push) van directo a la red.
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
@@ -214,6 +224,29 @@ self.addEventListener('sync', (evento) => {
     evento.waitUntil(sincronizarResenas());
   }
 });
+
+// ---------------------------------------------------------------------
+// Extra · Guarda lo compartido en IndexedDB y abre la vista para elegir cafetería
+// ---------------------------------------------------------------------
+async function recibirCompartido(request) {
+  try {
+    const datos = await request.formData();
+    const foto = datos.get('foto');
+    await self.CafeDB.guardar('compartidos', {
+      id: 'ultimo',
+      titulo: datos.get('titulo') || '',
+      texto: datos.get('texto') || '',
+      enlace: datos.get('enlace') || '',
+      // Un File es un Blob: IndexedDB lo guarda tal cual
+      foto: foto instanceof Blob && foto.size ? foto : null,
+      fecha: Date.now(),
+    });
+  } catch (e) {
+    console.error('[SW] no se pudo leer lo compartido', e);
+  }
+  // 303: el navegador abre la página con GET (y no reenvía el formulario)
+  return Response.redirect(new URL('./#/compartir', self.registration.scope).href, 303);
+}
 
 async function sincronizarResenas() {
   const cantidad = await self.CafeDB.enviarResenasPendientes('./api/resenas');
