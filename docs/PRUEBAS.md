@@ -63,6 +63,10 @@ Marca el resultado: ✅ pasa · ❌ falla · ➖ no aplica. Adjunta captura en c
 | CP-34 | Extra | Reseña con foto | Ficha → *Agregar foto* → publicar | La foto aparece en la reseña y se guarda en `data/fotos/` | | |
 | CP-35 | Extra | Foto sin conexión | Offline → reseña con foto → volver a *Online* | Queda «Se publicará al reconectar» con su foto; al reconectar se suben reseña y foto | | |
 | CP-36 | Extra | Compartir hacia la app | Android: galería → Compartir → CaféGuía (o el código del README) | Abre «¿De qué cafetería es?»; al elegir una, el formulario trae el texto y la foto | | |
+| CP-38 | Extra | Mapa con mi ubicación | Cerca de mí → *Usar mi ubicación* → *Permitir* | Punto azul con círculo de precisión; el mapa encuadra tu posición y las 4 cafeterías más cercanas | | |
+| CP-39 | Extra | Ubicación bloqueada | Bloquear el permiso y tocar *Usar mi ubicación* | Mensaje que explica cómo desbloquearla; los botones «Probar desde…» siguen funcionando | | |
+| CP-40 | Extra | Página no segura | Abrir la app desde el celular con `http://IP-de-la-PC:3000` | Mensaje que explica que hace falta https (usar GitHub Pages) | | |
+| CP-41 | Extra | Mapa sin conexión | Ver el mapa con internet → *Offline* → recargar | Se ven los mosaicos ya vistos (Cache Storage → `cafeguia-mapa`) | | |
 | CP-37 | Extra | Contador en el ícono | App instalada → reseña sin conexión | El ícono muestra 1; al publicarse, desaparece | | |
 
 ### Puntuación Lighthouse

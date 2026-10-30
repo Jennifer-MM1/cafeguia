@@ -24,6 +24,8 @@ async function arrancar() {
   await Promise.all([iniciarEnrutador(), minimo]);
   splash.classList.add('oculto');
   splash.addEventListener('transitionend', () => splash.remove(), { once: true });
+  // Respaldo: sin animación (movimiento reducido) "transitionend" nunca llega
+  setTimeout(() => splash.remove(), 600);
 }
 
 arrancar();

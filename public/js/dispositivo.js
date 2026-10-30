@@ -9,24 +9,65 @@ export const soporte = {
   orientacion: 'DeviceOrientationEvent' in window,
 };
 
-// GPS / ubicación
-export function obtenerUbicacion({ precisa = true, tiempoMax = 10000 } = {}) {
+// ---------- GPS / ubicación ----------
+
+// Error con un "codigo" para que la interfaz explique qué hacer en cada caso
+export class ErrorUbicacion extends Error {
+  constructor(codigo, mensaje) {
+    super(mensaje);
+    this.codigo = codigo; // 'inseguro' | 'no-soportado' | 'denegado' | 'no-disponible' | 'tiempo'
+  }
+}
+
+const CODIGOS = { 1: 'denegado', 2: 'no-disponible', 3: 'tiempo' };
+
+function pedirPosicion(opciones) {
   return new Promise((resolver, rechazar) => {
-    if (!soporte.geolocalizacion) return rechazar(new Error('Geolocalización no disponible'));
     navigator.geolocation.getCurrentPosition(
       (pos) => resolver({
         lat: pos.coords.latitude,
         lng: pos.coords.longitude,
         precision: Math.round(pos.coords.accuracy),
       }),
-      (error) => rechazar(new Error({
-        1: 'Permiso de ubicación denegado',
-        2: 'No se pudo determinar la ubicación',
-        3: 'Se agotó el tiempo para obtener la ubicación',
-      }[error.code] || error.message)),
-      { enableHighAccuracy: precisa, timeout: tiempoMax, maximumAge: 60000 }
+      (error) => rechazar(new ErrorUbicacion(CODIGOS[error.code] || 'no-disponible', error.message)),
+      opciones
     );
   });
+}
+
+// Estado del permiso sin preguntarle al usuario: 'granted' | 'denied' | 'prompt' | 'desconocido'
+export async function permisoUbicacion() {
+  try {
+    return (await navigator.permissions.query({ name: 'geolocation' })).state;
+  } catch {
+    return 'desconocido';
+  }
+}
+
+/**
+ * Pide la ubicación en dos intentos:
+ *  1. Precisa (GPS), con 8 s de espera.
+ *  2. Si tarda o no hay GPS (computadoras sin GPS, interiores), una aproximada
+ *     por wifi o red, aceptando una lectura de hasta 5 minutos de antigüedad.
+ * Si el permiso está bloqueado no tiene caso reintentar.
+ */
+export async function obtenerUbicacion({ precisa = true } = {}) {
+  // La geolocalización solo existe en páginas seguras: https:// o localhost.
+  // Abrir la app como http://192.168.x.x desde el celular la desactiva.
+  if (!window.isSecureContext) {
+    throw new ErrorUbicacion('inseguro', 'La página no es segura (https)');
+  }
+  if (!soporte.geolocalizacion) {
+    throw new ErrorUbicacion('no-soportado', 'Este navegador no ofrece ubicación');
+  }
+  if (precisa) {
+    try {
+      return await pedirPosicion({ enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
+    } catch (error) {
+      if (error.codigo === 'denegado') throw error;
+    }
+  }
+  return pedirPosicion({ enableHighAccuracy: false, timeout: 15000, maximumAge: 5 * 60 * 1000 });
 }
 
 // Distancia en km entre dos coordenadas (fórmula de Haversine)

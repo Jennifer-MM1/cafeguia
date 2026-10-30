@@ -146,6 +146,7 @@ Llena [docs/PRUEBAS.md](docs/PRUEBAS.md): herramientas, casos de prueba y Lighth
 | **Abierto ahora** | `js/horario.js` | Lógica sin red con la zona horaria de la ciudad (`Intl`, `America/Mexico_City`); filtro en el catálogo; en la ficha SSR lo agrega la hidratación porque depende de la hora |
 | **Fotos en las reseñas** | `js/imagen.js`, `js/db.js`, `server/resenas.js` | Cámara o galería, compresión con `<canvas>`, Blob guardado en IndexedDB y subida en dos pasos idempotentes (`POST` de la reseña + `PUT /api/resenas/:id/foto`) al reconectar |
 | **Compartir hacia CaféGuía** | `manifest.json` (`share_target`), `sw.js`, `js/vistas/compartir.js` | Web Share Target: el SW recibe el `POST` con la foto, la guarda en IndexedDB y redirige con `303`. Funciona también en GitHub Pages porque no toca el servidor |
+| **Mapa en «Cerca de mí»** | `js/mapa.js`, `vendor/leaflet/`, `sw.js` | Leaflet alojado en la app (carga solo al abrir el mapa) con mosaicos de OpenStreetMap; el SW guarda hasta 500 mosaicos ya vistos. La ubicación reintenta con menor precisión y explica cada falla (permiso bloqueado, página sin https, GPS apagado) |
 | **Contador en el ícono** | `js/db.js` (`actualizarInsignia`) | Badging API (`setAppBadge`): número de reseñas por publicar en el ícono de la app instalada, actualizado desde la página y desde el SW |
 
 **Créditos de las fotografías:** Jonathan Borba, julian urrutia, 99.films, Ichsan Chairul, Chris J. Davis, Robert Bye, Jorge Garcia, Konrad Hofmann, Homniom Coffee y Joseph Cortez, en [Unsplash](https://unsplash.com) (Licencia Unsplash). Cada foto muestra su crédito en la ficha de la cafetería. Son ilustrativas: las cafeterías de la guía son ficticias.
@@ -208,3 +209,10 @@ Para tener todo en línea, despliega `server.js` en un hosting con Node (Render,
    git push
    ```
 4. Al abrir la app, los usuarios verán **«✨ Hay una versión nueva»**.
+
+### Probar la ubicación en el celular
+
+Los navegadores solo dan la ubicación en páginas **https** o en **localhost**. Si abres la app desde el celular como `http://192.168.x.x:3000`, «Usar mi ubicación» no puede funcionar (la app lo explica en pantalla). Opciones:
+
+- Usar la versión publicada en GitHub Pages (es https).
+- En Chrome para Android, conectar el celular por USB y usar `chrome://inspect` → *Port forwarding* (`3000` → `localhost:3000`); así el celular abre `http://localhost:3000`.

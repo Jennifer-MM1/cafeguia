@@ -4,8 +4,8 @@ import { leerPreferencias, guardarPreferencia } from './preferencias.js';
 import { escaparHTML } from './util.js';
 
 export const CIUDADES = [
-  { nombre: 'San Juan del Río', referencia: 'el Jardín Independencia', centro: { lat: 20.3886, lng: -99.9961 } },
-  { nombre: 'Jalpan de Serra', referencia: 'la Misión de Santiago', centro: { lat: 21.2178, lng: -99.4731 } },
+  { nombre: 'San Juan del Río', referencia: 'la Plaza Independencia', centro: { lat: 20.3886, lng: -99.9961 } },
+  { nombre: 'Jalpan de Serra', referencia: 'la Misión de Santiago', centro: { lat: 21.2168, lng: -99.4739 } },
 ];
 
 // '' significa todas las ciudades

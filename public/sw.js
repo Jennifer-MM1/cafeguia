@@ -10,7 +10,7 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v20';
+const VERSION = 'v25';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
@@ -18,6 +18,10 @@ const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
 const CACHE_FOTOS = 'cafeguia-fotos';
 const ORIGEN_FOTOS = 'https://images.unsplash.com';
 // Mismo formato que public/js/fotos.js (miniatura y portada)
+// Mosaicos del mapa (OpenStreetMap): se guardan los que el usuario ya vio.
+// No se descargan zonas completas por adelantado (lo prohíben las reglas de uso).
+const CACHE_MAPA = 'cafeguia-mapa';
+const MAXIMO_MOSAICOS = 500;
 const fotoURL = (src, ancho) => `${src}?w=${ancho}&q=70&fm=jpg&fit=crop`;
 
 // App shell: todo lo necesario para arrancar sin red
@@ -36,6 +40,9 @@ const ARCHIVOS_SHELL = [
   './js/fotos.js',
   './js/horario.js',
   './js/ciudades.js',
+  './js/mapa.js',
+  './vendor/leaflet/leaflet.js',
+  './vendor/leaflet/leaflet.css',
   './fonts/bricolage-grotesque.woff2',
   './js/instalacion.js',
   './js/preferencias.js',
@@ -88,7 +95,7 @@ async function guardarFotosDelCatalogo() {
 // activate: borra cachés de versiones anteriores
 // ---------------------------------------------------------------------
 self.addEventListener('activate', (evento) => {
-  const vigentes = [CACHE_SHELL, CACHE_DATOS, CACHE_RECURSOS, CACHE_FOTOS];
+  const vigentes = [CACHE_SHELL, CACHE_DATOS, CACHE_RECURSOS, CACHE_FOTOS, CACHE_MAPA];
   evento.waitUntil(
     caches.keys().then((nombres) => Promise.all(
       nombres.filter((n) => n.startsWith('cafeguia-') && !vigentes.includes(n))
@@ -150,6 +157,29 @@ async function staleWhileRevalidate(request) {
   return enCache || actualizacion;
 }
 
+async function mosaicoDesdeCache(request, evento) {
+  const cache = await caches.open(CACHE_MAPA);
+  const enCache = await cache.match(request.url);
+  if (enCache) return enCache;
+  try {
+    const respuesta = await fetch(request);
+    if (respuesta.ok) {
+      evento.waitUntil(cache.put(request.url, respuesta.clone()).then(() => recortarCache(cache, MAXIMO_MOSAICOS)));
+    }
+    return respuesta;
+  } catch {
+    // Sin conexión y sin copia: un mosaico vacío para que el mapa no muestre errores
+    return new Response('', { status: 504, statusText: 'Sin conexión' });
+  }
+}
+
+// Borra las entradas más viejas cuando la caché pasa del máximo
+async function recortarCache(cache, maximo) {
+  const claves = await cache.keys();
+  if (claves.length <= maximo) return;
+  await Promise.all(claves.slice(0, claves.length - maximo).map((k) => cache.delete(k)));
+}
+
 async function fotoDesdeCache(request) {
   const cache = await caches.open(CACHE_FOTOS);
   const enCache = await cache.match(request.url);
@@ -169,6 +199,12 @@ self.addEventListener('fetch', (evento) => {
   // Fotos de Unsplash → cache first (sus URLs nunca cambian de contenido)
   if (request.method === 'GET' && url.origin === ORIGEN_FOTOS) {
     evento.respondWith(fotoDesdeCache(request));
+    return;
+  }
+
+  // Mosaicos del mapa → cache first, con límite de tamaño
+  if (request.method === 'GET' && url.hostname === 'tile.openstreetmap.org') {
+    evento.respondWith(mosaicoDesdeCache(request, evento));
     return;
   }
 
