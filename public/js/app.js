@@ -2,6 +2,9 @@
 import { registrarServiceWorker } from './registro-sw.js';
 import { iniciarEnrutador } from './enrutador.js';
 import './instalacion.js';
+import { aplicarTema } from './preferencias.js';
+
+aplicarTema();
 
 // Fase 5.2 · Ocultar el splash cuando la primera vista esté lista
 // (con un mínimo de 700 ms para que no sea un parpadeo).

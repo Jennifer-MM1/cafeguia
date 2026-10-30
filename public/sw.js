@@ -1,5 +1,5 @@
 // Fase 3.2 · Service worker básico con los tres eventos base.
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 
 const ARCHIVOS_SHELL = [
@@ -12,6 +12,8 @@ const ARCHIVOS_SHELL = [
   './js/api.js',
   './js/util.js',
   './js/instalacion.js',
+  './js/db.js',
+  './js/preferencias.js',
   './js/vistas/inicio.js',
   './js/vistas/catalogo.js',
   './js/vistas/ficha.js',
