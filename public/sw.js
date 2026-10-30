@@ -9,7 +9,7 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v9';
+const VERSION = 'v10';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;

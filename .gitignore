@@ -12,3 +12,6 @@ data/suscripciones.json
 Thumbs.db
 .vscode/
 *.log
+
+# Configuración local del editor/agente
+.claude/

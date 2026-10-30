@@ -25,7 +25,7 @@ async function pintarNotificaciones(caja) {
     ${!servidor ? '<p class="meta">Push necesita el servidor Node (no funciona en GitHub Pages).</p>' : ''}
     <div class="acciones">
       <button class="boton secundario" data-accion="local">Probar notificación local</button>
-      ${soportaPush() && servidor && !suscripcion ? '<button class="boton" data-accion="suscribir">Activar push</button>' : ''}
+      ${soportaPush() && servidor && !suscripcion && permiso !== 'denied' ? '<button class="boton" data-accion="suscribir">Activar push</button>' : ''}
       ${suscripcion && servidor ? '<button class="boton" data-accion="probar-push">Enviarme un push</button>' : ''}
       ${suscripcion ? '<button class="boton secundario" data-accion="desuscribir">Desactivar push</button>' : ''}
     </div>`;

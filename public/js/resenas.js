@@ -7,6 +7,7 @@ import { mostrarAviso } from './util.js';
 
 const db = self.CafeDB;
 const ETIQUETA_SYNC = 'enviar-resenas';
+let syncDisponible = 'SyncManager' in window;
 
 export async function resenasLocales(lugarId) {
   return db.porIndice('resenas', 'porLugar', Number(lugarId));
@@ -37,16 +38,23 @@ export async function guardarResena({ lugarId, autor, calificacion, texto }) {
 }
 
 async function programarEnvio() {
-  const registro = await navigator.serviceWorker?.ready;
-  if (registro && 'sync' in registro) {
-    await registro.sync.register(ETIQUETA_SYNC);
-    console.log('[sync] registrado', ETIQUETA_SYNC);
-  } else if (navigator.onLine) {
-    await enviarDesdeLaPagina();
+  if (syncDisponible) {
+    try {
+      const registro = await navigator.serviceWorker.ready;
+      await registro.sync.register(ETIQUETA_SYNC);
+      console.log('[sync] registrado', ETIQUETA_SYNC);
+      return;
+    } catch (e) {
+      // Algunos navegadores tienen la API pero desactivada (p. ej. Brave):
+      // "UnknownError: Background Sync is disabled"
+      console.warn('[sync] Background Sync no disponible:', e.message);
+      syncDisponible = false;
+    }
   }
+  if (navigator.onLine) await enviarDesdeLaPagina();
 }
 
-// Respaldo para Firefox y Safari (no tienen Background Sync)
+// Respaldo para Firefox, Safari y navegadores con Background Sync desactivado
 export async function enviarDesdeLaPagina() {
   try {
     const n = await db.enviarResenasPendientes();
@@ -63,7 +71,11 @@ function avisarSincronizadas(n) {
 
 export function iniciarSincronizacion() {
   window.addEventListener('online', () => {
-    if (!('SyncManager' in window)) enviarDesdeLaPagina();
+    if (!syncDisponible) enviarDesdeLaPagina();
+  });
+  // Reseñas que quedaron pendientes de una visita anterior
+  db.porIndice('resenas', 'porEstado', 'pendiente').then((p) => {
+    if (p.length && navigator.onLine) programarEnvio();
   });
   // El service worker avisa cuando terminó el sync en segundo plano
   navigator.serviceWorker?.addEventListener('message', (e) => {
