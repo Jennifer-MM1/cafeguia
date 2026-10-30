@@ -1,7 +1,7 @@
 // =====================================================================
 // CaféGuía · Service worker
 // Fase 3: eventos base · Fase 7: estrategias de caché y offline
-// Fase 8: Background Sync
+// Fase 8: Background Sync · Fase 9: ciclo de vida
 // =====================================================================
 
 // La misma capa IndexedDB que usa la página (expone self.CafeDB)
@@ -9,7 +9,7 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v6';
+const VERSION = 'v7';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
@@ -59,7 +59,20 @@ self.addEventListener('activate', (evento) => {
       nombres.filter((n) => n.startsWith('cafeguia-') && !vigentes.includes(n))
         .map((n) => caches.delete(n))
     ))
+      // Fase 9.1 · clients.claim(): el SW nuevo controla de inmediato las pestañas
+      // abiertas, sin esperar a que el usuario recargue.
+      .then(() => self.clients.claim())
   );
+});
+
+// ---------------------------------------------------------------------
+// Fase 9.1 · skipWaiting bajo demanda.
+// Una versión nueva se queda en "waiting" hasta que el usuario acepta el aviso;
+// así no se cambia el código a mitad de lo que está haciendo.
+// ---------------------------------------------------------------------
+self.addEventListener('message', (evento) => {
+  if (evento.data?.tipo === 'SKIP_WAITING') self.skipWaiting();
+  if (evento.data?.tipo === 'VERSION') evento.source?.postMessage({ tipo: 'VERSION', version: VERSION });
 });
 
 // ---------------------------------------------------------------------
