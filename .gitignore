@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+
+# Claves privadas y datos generados en tiempo de ejecución
+.env
+vapid.json
+data/resenas.json
+data/suscripciones.json
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
