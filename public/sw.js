@@ -1,4 +1,4 @@
-// =====================================================================
+﻿// =====================================================================
 // CaféGuía · Service worker
 // Fase 3: eventos base · Fase 7: estrategias de caché y offline
 // Fase 8: Background Sync · Fase 9: ciclo de vida · Fase 10: push
@@ -10,7 +10,7 @@ importScripts('./js/db.js');
 
 // Cambia este número en cada publicación: el navegador detecta un sw.js
 // distinto, instala la versión nueva y se borran las cachés viejas.
-const VERSION = 'v25';
+const VERSION = 'v26';
 const CACHE_SHELL = `cafeguia-shell-${VERSION}`;
 const CACHE_DATOS = `cafeguia-datos-${VERSION}`;
 const CACHE_RECURSOS = `cafeguia-recursos-${VERSION}`;
